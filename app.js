@@ -409,6 +409,7 @@
                 <span class="filter__face"><span class="filter__check">${CHECK_ICON}</span>${f.label}</span></button>`).join("");
         $("map-key").innerHTML = FILTERS.filter((f) => state.filters.has(f.kind)).map((f) =>
             `<li><span class="key-dot key-dot--${f.kind}">${GLYPH[f.kind]}</span>${f.label}</li>`).join("");
+        requestAnimationFrame(() => state.refreshScrollEdges?.());
     };
 
     const naverUrl = (pin) => `https://map.naver.com/p/search/${encodeURIComponent(`올림픽공원 ${pin.label}`)}`;
@@ -522,6 +523,7 @@
     const viewFromHash = () => (location.hash === "#map" ? "map" : "summary");
 
     const showView = (name, scrollTop) => {
+        requestAnimationFrame(() => state.refreshScrollEdges?.());
         state.view = name;
         $("view-summary").hidden = name !== "summary";
         $("view-map").hidden = name !== "map";
@@ -553,7 +555,74 @@
         state.filters = new Set(kinds.length ? kinds : ["rental"]);
     };
 
+    // PC 에선 세로 휠·마우스 끌기로도 옆으로 넘길 수 있게 한다 — 폰은 손가락으로 밀면 되지만
+    //   PC 는 스크롤바를 숨겨 놔서 넘길 방법이 없었다(Darren M:cze2)
+    const enableHScroll = (el) => {
+        const updateEdges = () => {
+            const max = el.scrollWidth - el.clientWidth;
+            el.classList.toggle("has-more-start", el.scrollLeft > 2);
+            el.classList.toggle("has-more-end", el.scrollLeft < max - 2);
+        };
+        el.addEventListener("scroll", updateEdges, { passive: true });
+        window.addEventListener("resize", updateEdges);
+        el.addEventListener("wheel", (e) => {
+            if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) {
+                return;
+            }
+            const max = el.scrollWidth - el.clientWidth;
+            const atEdge = (e.deltaY < 0 && el.scrollLeft <= 0) || (e.deltaY > 0 && el.scrollLeft >= max - 1);
+            if (max <= 0 || atEdge) {
+                return;
+            }
+            e.preventDefault();
+            el.scrollLeft += e.deltaY;
+        }, { passive: false });
+        let drag = null;
+        el.addEventListener("pointerdown", (e) => {
+            if (e.pointerType !== "mouse" || e.button !== 0) {
+                return;
+            }
+            drag = { x: e.clientX, left: el.scrollLeft, moved: false };
+        });
+        el.addEventListener("pointermove", (e) => {
+            if (!drag) {
+                return;
+            }
+            const dx = e.clientX - drag.x;
+            if (!drag.moved && Math.abs(dx) > 5) {
+                drag.moved = true;
+                el.classList.add("is-dragging");
+            }
+            if (drag.moved) {
+                el.scrollLeft = drag.left - dx;
+            }
+        });
+        const endDrag = () => {
+            if (drag?.moved) {
+                // 끌기가 끝난 직후의 클릭은 칩을 누른 것이 아니다
+                el.addEventListener("click", (ev) => {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                }, { capture: true, once: true });
+            }
+            drag = null;
+            el.classList.remove("is-dragging");
+        };
+        el.addEventListener("pointerup", endDrag);
+        el.addEventListener("pointerleave", () => {
+            if (drag && !drag.moved) {
+                drag = null;
+            }
+        });
+        return updateEdges;
+    };
+
     const bind = () => {
+        const edgeUpdaters = [...document.querySelectorAll(".h-scroll")].map(enableHScroll);
+        state.refreshScrollEdges = () => edgeUpdaters.forEach((fn) => fn());
+        requestAnimationFrame(state.refreshScrollEdges);
+        // 접힌 상자 안에선 폭이 0 이라 가장자리를 못 잰다 — 펼칠 때 다시 잰다
+        document.querySelector(".condition").addEventListener("toggle", () => state.refreshScrollEdges());
         document.querySelectorAll(".pick").forEach((btn) => btn.addEventListener("click", () => {
             toggleSet(state.who, btn.dataset.who);
             btn.setAttribute("aria-pressed", String(state.who.has(btn.dataset.who)));

@@ -1685,3 +1685,29 @@ select.field__input {
         scroll-behavior: auto;
     }
 }
+
+/* 한 줄 가로 스크롤 줄 — 끝이 남아 있으면 그쪽 가장자리를 흐리게 해서 «더 있음»을 보인다 */
+.h-scroll {
+    --fade: 28px;
+}
+
+.h-scroll.has-more-end {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent);
+}
+
+.h-scroll.has-more-start {
+    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - var(--fade)), transparent);
+    mask-image: linear-gradient(to left, #000 calc(100% - var(--fade)), transparent);
+}
+
+.h-scroll.has-more-start.has-more-end {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+}
+
+/* 마우스로 끌 때 글자 선택이 안 되게 */
+.h-scroll.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+}
