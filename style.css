@@ -291,10 +291,20 @@ summary::-webkit-details-marker {
     font-weight: 650;
 }
 
+/* 지도 필터와 같은 한 줄 가로 스크롤 — 동행 유형이 늘어도 같은 방식. 상자 안쪽 여백까지 끌어와 끝이 잘려 보이게 한다 */
 .condition__picks {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 8px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin: 0 -14px;
+    padding: 0 14px;
+    overflow-x: auto;
+    scroll-padding-inline: 14px;
+    scrollbar-width: none;
+}
+
+.condition__picks::-webkit-scrollbar {
+    display: none;
 }
 
 .pick {
@@ -307,37 +317,46 @@ summary::-webkit-details-marker {
 }
 
 .pick {
-    width: 100%;
+    flex: none;
 }
 
 .pick__face {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 5px;
-    width: 100%;
-    height: 38px;
-    padding: 0 12px;
+    height: 34px;
+    padding: 0 13px 0 10px;
     border: 1px solid #d3dbd6;
-    border-radius: 18px;
+    border-radius: 17px;
     background: #fff;
     color: #3d4a43;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     white-space: nowrap;
 }
 
-/* 버튼 폭이 칸에 고정이라 체크는 선택할 때만 나타나도 다른 버튼이 밀리지 않는다 */
-.pick__check {
+/* 미선택은 «+», 선택은 «체크» — 같은 자리에서 바뀌어 켜고 꺼도 버튼 폭이 안 변한다 */
+.pick__mark {
+    position: relative;
     width: 16px;
     height: 16px;
     flex: none;
+}
+
+.pick__mark svg {
+    position: absolute;
+    inset: 0;
+    width: 16px;
+    height: 16px;
     fill: none;
     stroke: currentColor;
     stroke-width: 2.2;
     stroke-linecap: round;
     stroke-linejoin: round;
-    display: none;
+}
+
+.pick__check {
+    visibility: hidden;
 }
 
 .pick[aria-pressed="true"] .pick__face {
@@ -346,8 +365,12 @@ summary::-webkit-details-marker {
     color: #fff;
 }
 
+.pick[aria-pressed="true"] .pick__plus {
+    visibility: hidden;
+}
+
 .pick[aria-pressed="true"] .pick__check {
-    display: block;
+    visibility: visible;
 }
 
 .pick:focus-visible {
