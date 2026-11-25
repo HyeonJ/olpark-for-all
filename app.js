@@ -308,8 +308,8 @@
             return;
         }
         const labels = whoLabels();
-        // 여러 유형이면 «○○ 등» — 숫자를 붙이면 «1명/1가지» 중 무엇을 세는지가 생긴다(Darren M:n8ax)
-        const who = labels.length > 1 ? `${labels[0]} 등` : labels[0] || "동행 선택 안 함";
+        // 여러 유형이면 «○○ 외» — 숫자를 붙이면 «1명/1가지» 중 무엇을 세는지가 생긴다(Darren M:n8ax → M:0ty2 «외»로 시험)
+        const who = labels.length > 1 ? `${labels[0]} 외` : labels[0] || "동행 선택 안 함";
         const holiday = when.holidayName ? ` ${esc(when.holidayName)}` : "";
         const tail = esc(who);
         // aria-label 은 일반 span 에선 낭독되지 않는다 — 누를 수 있는 summary 에 단다
