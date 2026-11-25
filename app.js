@@ -89,8 +89,18 @@
 
     const whoLabels = () => WHO_ORDER.filter((w) => state.who.has(w)).map((w) => WHO_LABEL[w]);
 
+    const showDate = (dateText) => {
+        if (!dateText) {
+            $("visit-date-shown").textContent = "날짜 선택";
+            return;
+        }
+        const day = new Date(`${dateText}T12:00:00+09:00`).getUTCDay();
+        $("visit-date-shown").textContent = `${Number(dateText.slice(5, 7))}월 ${Number(dateText.slice(8, 10))}일 (${WEEKDAY[day]})`;
+    };
+
     const readWhen = () => {
         const dateText = $("visit-date").value;
+        showDate(dateText);
         if (!/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
             return null;
         }
@@ -554,6 +564,13 @@
             renderMap();
         }));
         ["visit-date", "visit-hour"].forEach((id) => $(id).addEventListener("change", renderSummary));
+        $("visit-date").addEventListener("click", () => {
+            try {
+                $("visit-date").showPicker?.();
+            } catch (err) {
+                console.error("[showPicker] 실패", err);
+            }
+        });
         $("map-filters").addEventListener("click", (e) => {
             const btn = e.target.closest(".filter");
             if (btn) {
