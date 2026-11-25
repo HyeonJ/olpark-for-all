@@ -303,9 +303,10 @@
             $("day-kind").textContent = "";
             return;
         }
-        const who = whoLabels().join("·") || "동행 선택 안 함";
+        const labels = whoLabels();
+        const who = labels.length > 1 ? `${labels[0]} 외 ${labels.length - 1}명` : labels[0] || "동행 선택 안 함";
         const holiday = when.holidayName ? ` ${esc(when.holidayName)}` : "";
-        const tail = who === "동행 선택 안 함" ? who : `${esc(who)} 동행`;
+        const tail = labels.length === 1 ? `${esc(who)} 동행` : esc(who);
         $("condition-text").innerHTML = `<b>${when.month}.${when.dayNum} (${when.weekday})${holiday}</b>${dot}${when.hour}시 도착${dot}${tail}`;
         $("day-kind").innerHTML = dayKindText(when);
     };

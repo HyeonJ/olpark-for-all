@@ -252,6 +252,13 @@ summary::-webkit-details-marker {
     transform: rotate(180deg);
 }
 
+.condition__text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .condition__text b {
     font-size: 16px;
     font-weight: 700;
@@ -285,56 +292,119 @@ summary::-webkit-details-marker {
 }
 
 .condition__picks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 8px;
 }
 
 .pick {
+    display: flex;
+    align-items: center;
     min-height: 44px;
-    padding: 9px 14px;
-    border: 1px solid #b6c1ba;
-    border-radius: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+.pick {
+    width: 100%;
+}
+
+.pick__face {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #d3dbd6;
+    border-radius: 18px;
     background: #fff;
-    color: var(--secondary);
-    font-size: 14px;
-    font-weight: 650;
+    color: #3d4a43;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
-.pick[aria-pressed="true"] {
-    border-color: #659b77;
-    background: var(--green-soft);
-    color: #175c3d;
+/* 버튼 폭이 칸에 고정이라 체크는 선택할 때만 나타나도 다른 버튼이 밀리지 않는다 */
+.pick__check {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: none;
 }
 
-.pick[aria-pressed="true"]::before {
-    content: "✓ ";
-    font-weight: 750;
+.pick[aria-pressed="true"] .pick__face {
+    border-color: var(--green);
+    background: var(--green);
+    color: #fff;
+}
+
+.pick[aria-pressed="true"] .pick__check {
+    display: block;
+}
+
+.pick:focus-visible {
+    outline: none;
+}
+
+.pick:focus-visible .pick__face {
+    outline: 3px solid #145cb2;
+    outline-offset: 2px;
 }
 
 .condition__row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
     gap: 10px;
 }
 
 .field {
-    flex: 1 1 140px;
+    min-width: 0;
     display: grid;
     gap: 4px;
     color: var(--ink);
     font-weight: 650;
 }
 
+/* iOS 사파리는 date 입력에 고유 최소 폭·가운데 정렬을 걸어 칸을 넘친다 — 기본 모양을 끄고 폭을 칸에 묶는다.
+   글자 16px 미만이면 iOS 가 입력할 때 화면을 확대하므로 16px 로 둔다. */
 .field__input {
-    min-height: 44px;
+    display: block;
     width: 100%;
-    padding: 8px 10px;
+    min-width: 0;
+    height: 48px;
+    margin: 0;
+    padding: 0 12px;
     border: 1px solid #b6c1ba;
     border-radius: 10px;
     background: #fff;
     color: var(--ink);
-    font-size: 15px;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.field__input::-webkit-date-and-time-value {
+    text-align: left;
+}
+
+.field__input::-webkit-datetime-edit {
+    padding: 0;
+}
+
+select.field__input {
+    padding-right: 36px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23535e59' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 18px;
 }
 
 .holiday {
