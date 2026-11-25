@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="240" viewBox="0 0 960 240" role="img" aria-labelledby="title desc">
+  <title id="title">모두의 올팍 — 함께 걷는 언덕 가로형 로고</title>
+  <desc id="desc">서로 이어지는 두 언덕과 입구가 넓은 파란 산책길로 함께 출발하는 여유로운 나들이를 표현합니다. 아이콘 오른쪽에 모두의 올팍 로고타입을 배치합니다.</desc>
+  <g transform="translate(24 24) scale(0.375)">
+  <rect width="512" height="512" rx="112" fill="#FFF2D8"/>
+  <path fill="#2C6A45" d="M64 354c52-127 124-170 194-75 59-64 128-52 190 75v58H64Z"/>
+  <path fill="#FFF2D8" d="M272 282c-48 34-64 56-43 80 17 19 52 36 90 70H187c-26-26-39-49-37-73 3-37 46-66 96-87Z"/>
+  <path fill="#1557B8" d="M268 285c-36 34-47 56-23 80 19 19 49 37 74 67h-78c-38-37-65-60-62-83 3-24 39-47 74-65Z"/>
+  </g>
+  <text x="256" y="150" fill="#2C6A45" font-family="Pretendard, 'Apple SD Gothic Neo', sans-serif" font-weight="800" font-size="88" letter-spacing="-3">모두의 올팍</text>
+</svg>

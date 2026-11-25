@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">모두의 올팍 — 열린 평화의문</title>
+  <desc id="desc">날개처럼 펼쳐지는 지붕과 활짝 열린 문, 입구로 이어지는 길로 모두를 환영하는 공원의 시작을 표현합니다. 모티프: 세계평화의문 지붕의 양 날개 · 두 기둥.</desc>
+  <rect width="512" height="512" rx="112" fill="#FFF2D8"/>
+  <path fill="#2C6A45" d="M64 124c68 42 130 51 192 16 62 35 124 26 192-16l-22 76c-59 29-118 29-170 2-52 27-111 27-170-2Z"/>
+  <path fill="#2C6A45" d="M140 226h56v142h-56zM316 226h56v142h-56z"/>
+  <path fill="#1557B8" d="M240 314h32c-4 41 8 76 48 118H192c40-42 52-77 48-118Z"/>
+</svg>

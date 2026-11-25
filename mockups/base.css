@@ -1,0 +1,117 @@
+/* 공통 토큰 — 공원(잔디·호수)과 국제 접근성 표지(ISA 파랑)에서 가져온 색 */
+:root {
+    --paper: #f1f4ef;
+    --surface: #ffffff;
+    --ink: #16231c;
+    --muted: #55645a;
+    --line: #d6ded6;
+    --green: #2c6a45;
+    --green-soft: #dfeadf;
+    --lake: #8fc1d8;
+    --isa: #1557b8;
+    --isa-soft: #e3ecfa;
+    --low: #23774a;
+    --mid: #9a6200;
+    --high: #b2322a;
+    --park-fill: #cfe2c6;
+    --font: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --paper: #101712;
+        --surface: #18221b;
+        --ink: #eaf1eb;
+        --muted: #a9b8ad;
+        --line: #2f3d33;
+        --green: #7cc896;
+        --green-soft: #1f3326;
+        --lake: #3b6f88;
+        --isa: #8db4ff;
+        --isa-soft: #1a2a45;
+        --low: #7cc896;
+        --mid: #f0b85a;
+        --high: #ff8b80;
+        --park-fill: #22382a;
+        color-scheme: dark;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding-block: 20px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -.01em;
+    color: var(--green);
+}
+
+.brand__mark {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--isa);
+    color: #fff;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1.5px solid currentColor;
+}
+
+.chip--low { color: var(--low); }
+.chip--mid { color: var(--mid); }
+.chip--high { color: var(--high); }
+
+.source-line {
+    font-size: 12.5px;
+    color: var(--muted);
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    flex: none;
+}
+
+.park-map {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.park-map__park { fill: var(--park-fill); stroke: var(--green); stroke-width: 3; }
+.park-map__water { fill: var(--lake); }
+.park-map__label { font: 700 26px var(--font); fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 6px; }

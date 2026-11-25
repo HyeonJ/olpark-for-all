@@ -1,0 +1,96 @@
+{
+  "place": "올림픽공원",
+  "address": "서울특별시 송파구 올림픽로 424 (방이동)",
+  "phone": "02-410-1114",
+  "hours": {
+    "walk": "도보·자전거 05:00~22:00 (광장지역 24:00)",
+    "car": "차량 06:00~22:00",
+    "note": "심야 행사 시에는 출입문 개방 조정"
+  },
+  "sources": [
+    {
+      "id": "api",
+      "name": "한국관광공사 무장애 여행 정보 API (KorWithService2 · detailWithTour2 · contentId 126532)",
+      "checkedAt": "2026-11-25"
+    },
+    {
+      "id": "web",
+      "name": "한국관광공사 열린관광 모두의 여행 — 올림픽공원 상세",
+      "url": "https://access.visitkorea.or.kr/ms/detail.do?cotId=d76e3409-a284-4b63-9ae3-bd2f74b0422e",
+      "updatedAt": "2026-11-10",
+      "checkedAt": "2026-11-25"
+    }
+  ],
+  "items": [
+    {
+      "key": "parking",
+      "label": "장애인 주차",
+      "for": ["wheelchair", "senior"],
+      "api": "장애인 주차장 140칸 있음",
+      "web": "주차 개수 : 140",
+      "status": "differs",
+      "note": "API는 «장애인 주차장 140칸», 웹은 «주차 개수 140»으로만 적혀 있어 140이 장애인 전용면 수인지 확인이 필요해요."
+    },
+    {
+      "key": "entrance",
+      "label": "출입구 접근",
+      "for": ["wheelchair", "stroller", "senior"],
+      "api": "출입구까지 턱이 없어 휠체어 접근 가능 · 주출입구 턱 없음",
+      "web": "출입구까지 턱이 없어 휠체어 접근 가능함",
+      "status": "same"
+    },
+    {
+      "key": "wheelchair",
+      "label": "휠체어 대여",
+      "for": ["wheelchair", "senior"],
+      "api": "평화의광장 앞 공원안내센터, 만남의 광장 내 동1문 안내센터",
+      "web": "평화의광장 앞 공원안내센터, 만남의 광장 내 동1문 안내센터",
+      "status": "same",
+      "note": "보유 수량·실시간 대여 가능 여부는 공개되지 않아요. 가기 전에 전화로 확인하세요."
+    },
+    {
+      "key": "stroller",
+      "label": "유모차 대여",
+      "for": ["stroller"],
+      "api": "평화의 광장 안내센터 4대, 동1문 안내센터 3대",
+      "web": "평화의 광장 안내센터, 동1문 안내센터 · 유모차 대수 4",
+      "status": "differs",
+      "note": "API는 센터별 4대·3대, 웹은 «4대»로만 적혀 있어요. 수량이 적으니 미리 확인하세요."
+    },
+    {
+      "key": "restroom",
+      "label": "장애인 화장실",
+      "for": ["wheelchair", "senior"],
+      "api": "장애인 화장실 있음",
+      "web": "있음",
+      "status": "same",
+      "note": "정확한 위치는 공개 데이터에 없어요."
+    },
+    {
+      "key": "ramp",
+      "label": "경사로",
+      "for": ["wheelchair", "stroller"],
+      "api": "공원 내 시설에 장애인 주출입구 접근로 경사로 있음",
+      "web": "공원 내 시설에 장애인 주출입구 접근로 경사로 있음",
+      "status": "same"
+    },
+    {
+      "key": "nursing",
+      "label": "수유실",
+      "for": ["stroller"],
+      "api": "안내센터, 한성백제박물관 1층",
+      "web": "있음",
+      "status": "differs",
+      "note": "위치는 API에만 적혀 있어요."
+    },
+    {
+      "key": "braille",
+      "label": "점자 안내",
+      "for": ["visual"],
+      "api": "점자안내판 있음 (우리금융아트홀, 핸드볼 경기장, 테니스 경기장, 실내 테니스 경기장)",
+      "web": "점자 홍보물 수령장소 : 우리금융아트홀, 핸드볼 경기장, 테니스 경기장, 실내 테니스 경기장",
+      "status": "differs",
+      "note": "API는 «점자안내판», 웹은 «점자 홍보물 수령장소»로 달라요. 안내판인지 홍보물인지 확인이 필요해요."
+    }
+  ]
+}

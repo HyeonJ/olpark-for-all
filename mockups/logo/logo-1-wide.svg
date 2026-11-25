@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="240" viewBox="0 0 960 240" role="img" aria-labelledby="title desc">
+  <title id="title">모두의 올팍 — 나무 아래 모임 가로형 로고</title>
+  <desc id="desc">나홀로나무와 넓은 언덕, 아래로 흐르는 호수의 곡선으로 누구나 쉬어 갈 수 있는 나들이의 중심을 표현합니다. 아이콘 오른쪽에 모두의 올팍 로고타입을 배치합니다.</desc>
+  <g transform="translate(24 24) scale(0.375)">
+  <rect width="512" height="512" rx="112" fill="#FFF2D8"/>
+  <path fill="#2C6A45" d="M234 229h44v113h-44z"/>
+  <path fill="#2C6A45" d="M256 104c-35 0-65 21-76 52-31 3-54 28-54 59 0 34 27 61 61 61h138c34 0 61-27 61-61 0-31-23-56-54-59-11-31-41-52-76-52Z"/>
+  <path fill="#2C6A45" d="M64 368q192-126 384 0v24H64Z"/>
+  <path fill="#1557B8" d="M88 422c88-38 158 30 244 0 35-12 63-17 92-12v34c-32-6-54 0-82 10-89 30-168-34-254 0Z"/>
+  </g>
+  <text x="256" y="150" fill="#2C6A45" font-family="Pretendard, 'Apple SD Gothic Neo', sans-serif" font-weight="800" font-size="88" letter-spacing="-3">모두의 올팍</text>
+</svg>

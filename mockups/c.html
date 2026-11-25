@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>모두의 올팍 · 단계형</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"><link rel="stylesheet" href="base.css"><style>
+.chart { width: 100%; height: auto; display: block; }
+.chart__area { fill: var(--green-soft); }
+.chart__line { fill: none; stroke: var(--green); stroke-width: 2.5; }
+.chart__guide { stroke: var(--high); stroke-dasharray: 4 4; stroke-width: 1.2; opacity: .7; }
+.chart__pick { stroke: var(--ink); stroke-width: 1.5; }
+.chart__dot { fill: var(--surface); stroke: var(--ink); stroke-width: 3; }
+.chart__tick { font: 500 12px var(--font); fill: var(--muted); }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 18px 0 22px; }
+.step { font-size: 13px; font-weight: 700; color: var(--muted); }
+.step::before { content: ""; display: block; height: 5px; border-radius: 3px; background: var(--line); margin-bottom: 6px; }
+.step--done::before, .step--now::before { background: var(--green); }
+.step--now { color: var(--ink); }
+.kicker { font-size: 14px; font-weight: 800; color: var(--green); }
+.title { margin: 4px 0 6px; font-size: 28px; line-height: 1.25; font-weight: 800; letter-spacing: -.03em; text-wrap: balance; }
+.lead { margin: 0 0 18px; color: var(--muted); }
+.progress { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px; background: var(--green-soft); margin-bottom: 14px; }
+.progress__ring { --p: 50; width: 46px; height: 46px; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p) * 1%), var(--line) 0); display: grid; place-items: center; }
+.progress__ring::after { content: attr(data-v); width: 34px; height: 34px; border-radius: 50%; background: var(--green-soft); display: grid; place-items: center; font-size: 13px; font-weight: 800; }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.check { display: grid; grid-template-columns: 30px 1fr; gap: 12px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
+.check__box { width: 30px; height: 30px; border-radius: 9px; border: 2px solid var(--line); display: grid; place-items: center; color: #fff; }
+.check--done .check__box { background: var(--green); border-color: var(--green); }
+.check--done .check__title { text-decoration: line-through; text-decoration-color: var(--muted); color: var(--muted); }
+.check__title { font-weight: 800; }
+.check__desc { color: var(--muted); font-size: 15px; margin-top: 2px; }
+.check__tag { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; padding: 3px 8px; border-radius: 8px; background: var(--isa-soft); color: var(--isa); font-size: 13px; font-weight: 700; }
+.summary { margin-top: 18px; padding: 18px; border-radius: 20px; background: var(--ink); color: var(--paper); }
+.summary h2 { margin: 0 0 8px; font-size: 16px; }
+.summary p { margin: 0; font-size: 15px; opacity: .9; }
+.summary button { margin-top: 14px; width: 100%; min-height: 50px; border: 0; border-radius: 14px; background: var(--paper); color: var(--ink); font: 800 16px var(--font); }
+</style></head>
+<body><div class="app">
+<div class="brand"><span class="brand__mark"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M12 7v6h5l2 5"/><path d="M9 10a6 6 0 1 0 7 8"/></svg></span>모두의 올팍</div>
+<div class="steps"><div class="step step--done">누구와</div><div class="step step--done">언제</div><div class="step step--now">출발 전 준비</div></div>
+<div class="kicker">휠체어 · 11월 29일(토) 오전 10시</div>
+<h1 class="title">출발 전에 이 4가지만 챙기면 돼요</h1>
+<p class="lead">토요일 10시는 작년 같은 시기 기준 <strong>보통</strong>이에요(1,423대). 오후 2~3시보다 덜 붐벼요.</p>
+<div class="progress"><div class="progress__ring" style="--p: 50" data-v="2/4"></div><div><strong>2개 준비 완료</strong><br><span class="source-line">체크한 항목은 이 기기에만 저장돼요</span></div></div>
+<ul class="checks">
+  <li class="check check--done"><span class="check__box"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></span><div><div class="check__title">도착 시간 정하기</div><div class="check__desc">10시 도착 · 가장 한산한 때는 9시 · 18시</div></div></li>
+  <li class="check"><span class="check__box"></span><div><div class="check__title">휠체어 대여 전화 확인</div><div class="check__desc">평화의광장 앞 공원안내센터 또는 동1문 안내센터. 수량은 공개되지 않아요.</div><span class="check__tag"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>02-410-1114</span></div></li>
+  <li class="check check--done"><span class="check__box"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></span><div><div class="check__title">쉴 곳·화장실 위치 보기</div><div class="check__desc">휠체어 화장실 4곳을 지도에 표시했어요.</div></div></li>
+  <li class="check"><span class="check__box"></span><div><div class="check__title">그날 공연 있는지 확인</div><div class="check__desc">공연이 끝나는 시간 앞뒤로 차가 몰려요. 공원 홈페이지 일정에서 확인하세요.</div><span class="check__tag"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>공연 일정 보기</span></div></li>
+</ul>
+<section class="summary"><h2>가족에게 보내기</h2><p>11/29(토) 10시 올림픽공원 · 휠체어는 평화의광장 앞 안내센터에서 대여 · 화장실 4곳 · 공원 안내 02-410-1114</p><button type="button">문장 복사하기</button></section>
+</div></body></html>

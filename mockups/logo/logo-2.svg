@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">모두의 올팍 — 호수를 품은 섬</title>
+  <desc id="desc">호수가 초록 섬을 둥글게 감싸는 형태로 공원이 모두를 품어 주는 편안함을 표현합니다. 모티프: 몽촌호 · 나홀로나무.</desc>
+  <rect width="512" height="512" rx="112" fill="#FFF2D8"/>
+  <path fill="#1557B8" fill-rule="evenodd" d="M256 218c108 0 196 46 196 104s-88 104-196 104S60 380 60 322s88-104 196-104Zm0 42c-83 0-150 27-150 60s67 60 150 60 150-27 150-60-67-60-150-60Z"/>
+  <path fill="#FFF2D8" d="M118 306q138-142 276 0v24H118Z"/>
+  <path fill="#2C6A45" d="M140 306q116-110 232 0Z"/>
+  <path fill="#2C6A45" d="M238 196h36v90h-36z"/>
+  <path fill="#2C6A45" d="M256 100c-35 0-63 28-63 63-18 7-29 24-29 43 0 25 20 45 45 45h94c25 0 45-20 45-45 0-19-11-36-29-43 0-35-28-63-63-63Z"/>
+</svg>

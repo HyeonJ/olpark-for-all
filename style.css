@@ -1,0 +1,1587 @@
+/* 모두의 올팍 — 모바일 한 열 앱. 승인된 시안(mockups/codex/design-3.html)의 토큰을 그대로 쓴다. */
+:root {
+    --ink: #202927;
+    --secondary: #535e59;
+    --green: #176545;
+    --green-soft: #eaf5ed;
+    --line: #e8ece9;
+    --canvas: #f3f5f4;
+    --orange: #89510e;
+    --orange-soft: #fff3df;
+    --blue: #285e93;
+    --map-bg: #edf1e8;
+    --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+    color-scheme: light;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 12px;
+}
+
+body {
+    margin: 0;
+    background: #e7ebe9;
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: -0.025em;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+summary,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    color: inherit;
+    cursor: pointer;
+}
+
+a,
+button,
+summary {
+    -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
+
+h1,
+h2,
+h3 {
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+h2 {
+    font-size: 21px;
+    letter-spacing: -0.035em;
+}
+
+h3 {
+    font-size: 16px;
+}
+
+svg {
+    display: block;
+}
+
+summary {
+    list-style: none;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+:focus-visible {
+    outline: 3px solid #145cb2;
+    outline-offset: 3px;
+}
+
+/* hidden 속성이 display 지정 규칙에 밀리지 않게 하는 유일한 !important */
+[hidden] {
+    display: none !important;
+}
+
+.icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: -9999px;
+    z-index: 50;
+    padding: 12px;
+    background: #fff;
+}
+
+.skip-link:focus {
+    left: 12px;
+}
+
+/* 레이아웃 */
+.app {
+    width: 100%;
+    max-width: 412px;
+    margin: auto;
+    background: #fff;
+}
+
+.view {
+    background: #fff;
+}
+
+.top {
+    min-height: 58px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.brand {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 19px;
+    font-weight: 780;
+    letter-spacing: -0.055em;
+}
+
+.brand__logo {
+    width: 32px;
+    height: 32px;
+}
+
+.park-name {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--secondary);
+    font-size: 13px;
+    font-weight: 550;
+}
+
+.park-name .icon {
+    width: 15px;
+    height: 15px;
+}
+
+.tabs {
+    display: flex;
+    gap: 26px;
+    padding: 0 20px;
+    box-shadow: 0 1px 0 var(--line);
+}
+
+.tabs__link {
+    position: relative;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    color: var(--secondary);
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.tabs__link[aria-current] {
+    color: var(--ink);
+    font-weight: 750;
+}
+
+.tabs__link[aria-current]::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--ink);
+}
+
+/* 방문 조건 */
+.condition {
+    margin: 16px 20px 0;
+    border-radius: 14px;
+    background: var(--canvas);
+}
+
+.condition__summary {
+    min-height: 56px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 550;
+    letter-spacing: -0.035em;
+    cursor: pointer;
+}
+
+.condition__summary > .icon {
+    width: 20px;
+    height: 20px;
+    color: var(--secondary);
+}
+
+.condition__summary .arrow {
+    width: 18px;
+    margin-left: auto;
+}
+
+.condition[open] .arrow {
+    transform: rotate(180deg);
+}
+
+.condition__text b {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.condition__dot {
+    margin: 0 6px;
+    color: var(--secondary);
+}
+
+.condition__body {
+    padding: 0 14px 14px;
+    display: grid;
+    gap: 14px;
+    color: var(--secondary);
+    font-size: 13px;
+}
+
+.condition__group {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.condition__legend {
+    padding: 0;
+    margin-bottom: 8px;
+    color: var(--ink);
+    font-weight: 650;
+}
+
+.condition__picks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pick {
+    min-height: 44px;
+    padding: 9px 14px;
+    border: 1px solid #b6c1ba;
+    border-radius: 24px;
+    background: #fff;
+    color: var(--secondary);
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.pick[aria-pressed="true"] {
+    border-color: #659b77;
+    background: var(--green-soft);
+    color: #175c3d;
+}
+
+.pick[aria-pressed="true"]::before {
+    content: "✓ ";
+    font-weight: 750;
+}
+
+.condition__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.field {
+    flex: 1 1 140px;
+    display: grid;
+    gap: 4px;
+    color: var(--ink);
+    font-weight: 650;
+}
+
+.field__input {
+    min-height: 44px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #b6c1ba;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 15px;
+}
+
+.holiday {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.holiday input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--green);
+}
+
+.condition__note {
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* 첫 화면 답 */
+.hero {
+    padding: 25px 24px 18px;
+}
+
+.tag {
+    min-height: 24px;
+    padding: 2px 8px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    background: var(--canvas);
+    color: var(--secondary);
+    font-size: 12px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.hero .tag {
+    margin-bottom: 10px;
+    background: var(--green-soft);
+    color: var(--green);
+}
+
+.hero__title {
+    font-size: 28px;
+    font-weight: 750;
+    line-height: 1.35;
+    letter-spacing: -0.055em;
+}
+
+.hero__title strong {
+    color: var(--green);
+    font-weight: 780;
+}
+
+.hero__title--small {
+    font-size: 22px;
+}
+
+.hero__sub {
+    margin-top: 10px;
+    color: var(--secondary);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.event-note {
+    margin: 0 24px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 10px;
+    color: var(--secondary);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.event-note a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--green);
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.rental-call {
+    margin: 0 20px 24px;
+    padding: 18px;
+    border-radius: 16px;
+    background: var(--orange-soft);
+}
+
+.rental-call__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.rental-call__head > .icon {
+    margin-top: 2px;
+    color: var(--orange);
+}
+
+.rental-call h2 {
+    font-size: 16px;
+    font-weight: 750;
+    letter-spacing: -0.035em;
+}
+
+.rental-call p {
+    margin-top: 4px;
+    color: #6d522f;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.call-inline {
+    min-height: 44px;
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #e4ceaa;
+    border-radius: 9px;
+    background: #fff;
+    color: #70420a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.call-inline .icon {
+    width: 17px;
+    height: 17px;
+}
+
+/* 섹션 공통 */
+.block {
+    padding: 26px 20px;
+}
+
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.section-head h2 {
+    font-size: 20px;
+}
+
+.flow {
+    padding-top: 23px;
+    border-top: 8px solid var(--canvas);
+}
+
+.metric {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+}
+
+.metric strong {
+    font-size: 40px;
+    font-weight: 760;
+    line-height: 1.2;
+    letter-spacing: -0.055em;
+    font-variant-numeric: tabular-nums;
+}
+
+.metric strong small {
+    margin-left: 3px;
+    font-size: 19px;
+    font-weight: 600;
+}
+
+.metric > span {
+    color: var(--secondary);
+    font-size: 13px;
+}
+
+.range {
+    margin-top: 6px;
+    color: var(--secondary);
+    font-size: 14px;
+}
+
+.chart {
+    width: 100%;
+    height: auto;
+    margin-top: 8px;
+    overflow: visible;
+}
+
+.chart text {
+    fill: #535e59;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 550;
+}
+
+.chart__grid {
+    fill: none;
+    stroke: #e1e7e3;
+    stroke-width: 1;
+}
+
+.chart__area {
+    fill: #e7f2e9;
+}
+
+.chart__line {
+    fill: none;
+    stroke: var(--green);
+    stroke-width: 2.6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.chart__threshold {
+    fill: none;
+    stroke: var(--orange);
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+}
+
+.chart .chart__threshold-label {
+    fill: var(--orange);
+}
+
+.chart__cursor {
+    fill: none;
+    stroke: var(--green);
+    stroke-dasharray: 3 3;
+}
+
+.chart__point {
+    fill: #fff;
+    stroke: var(--green);
+    stroke-width: 2.5;
+}
+
+.chart__tag {
+    fill: var(--green);
+}
+
+.chart .chart__tag-text {
+    fill: #fff;
+}
+
+.comparison {
+    margin: 12px 0;
+    padding: 13px 14px;
+    border-radius: 10px;
+    background: var(--canvas);
+    font-size: 14px;
+}
+
+.comparison strong {
+    color: var(--green);
+    font-weight: 700;
+}
+
+.source-line {
+    color: var(--secondary);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.flow .source-line {
+    margin-top: 10px;
+}
+
+.data-detail {
+    margin-top: 8px;
+}
+
+.data-detail__summary {
+    min-height: 44px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--secondary);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.data-detail__summary .icon {
+    width: 15px;
+    height: 15px;
+}
+
+.data-detail[open] > .data-detail__summary .icon {
+    transform: rotate(180deg);
+}
+
+.detail-body {
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--canvas);
+    color: var(--secondary);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.detail-body p + p {
+    margin-top: 12px;
+}
+
+.detail-body strong {
+    color: var(--ink);
+    font-weight: 650;
+}
+
+.chart-table {
+    width: 100%;
+    margin-top: 12px;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.chart-table caption {
+    text-align: left;
+    font-weight: 650;
+}
+
+.chart-table th,
+.chart-table td {
+    padding: 8px 5px;
+    border-bottom: 1px solid #d8dfda;
+    text-align: left;
+}
+
+.chart-table th {
+    font-weight: 650;
+}
+
+/* 방문 전 확인 */
+.prep {
+    padding-bottom: 16px;
+    border-top: 8px solid var(--canvas);
+}
+
+.fact-list {
+    margin: 22px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 24px;
+    list-style: none;
+}
+
+.fact {
+    display: flex;
+    gap: 13px;
+}
+
+.fact__icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: var(--canvas);
+    color: var(--green);
+}
+
+.fact__icon .icon {
+    width: 21px;
+    height: 21px;
+}
+
+.fact p {
+    margin-top: 4px;
+    color: var(--secondary);
+    font-size: 14px;
+    line-height: 1.65;
+    word-break: keep-all;
+}
+
+.fact__link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.fact__link .icon {
+    width: 16px;
+    height: 16px;
+}
+
+.mismatch {
+    margin-top: 24px;
+    border-radius: 12px;
+    background: #f7f5ef;
+}
+
+.mismatch__summary {
+    min-height: 56px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.mismatch__summary > .icon {
+    width: 18px;
+    color: #735315;
+}
+
+.mismatch__summary .arrow {
+    width: 16px;
+    margin-left: auto;
+}
+
+.mismatch[open] .arrow {
+    transform: rotate(180deg);
+}
+
+.mismatch .detail-body {
+    padding-top: 0;
+    background: none;
+}
+
+.versus {
+    margin-top: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.versus > span {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fff;
+    line-height: 1.55;
+}
+
+.versus b {
+    display: block;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.mismatch-note {
+    display: block;
+    margin-top: 6px;
+}
+
+/* 지도 미리보기 */
+.map-preview {
+    padding-bottom: 24px;
+    border-top: 8px solid var(--canvas);
+}
+
+.map-preview .section-head a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--secondary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.map-preview .section-head a .icon {
+    width: 16px;
+}
+
+.map-thumb {
+    height: 210px;
+    margin-top: 10px;
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--map-bg);
+}
+
+.map-thumb .park-map {
+    width: 100%;
+    height: 100%;
+}
+
+.thumb-label {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #dce3db;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 6px #223c2612;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.thumb-label .icon {
+    width: 16px;
+    height: 16px;
+    color: var(--green);
+}
+
+.map-preview__note {
+    margin-top: 12px;
+    color: var(--secondary);
+    font-size: 14px;
+}
+
+/* 실시간 주차 */
+.live {
+    border-top: 8px solid var(--canvas);
+}
+
+.live-number {
+    margin-top: 12px;
+    font-size: 32px;
+    font-weight: 750;
+    letter-spacing: -0.04em;
+}
+
+.live-number small {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.live-number span {
+    margin-left: 8px;
+    color: var(--secondary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.live .source-line {
+    margin-top: 8px;
+}
+
+.retry {
+    min-height: 44px;
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: 1px solid #b6c1ba;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.live-notice {
+    margin-top: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    color: var(--secondary);
+    font-size: 13px;
+}
+
+.live-notice .icon {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+}
+
+.sources {
+    padding: 0 20px;
+    border-top: 8px solid var(--canvas);
+}
+
+.sources > summary {
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.sources > summary .icon {
+    width: 18px;
+    color: var(--secondary);
+}
+
+.sources[open] > summary .icon {
+    transform: rotate(180deg);
+}
+
+.sources .detail-body {
+    margin-bottom: 20px;
+}
+
+.footer {
+    padding: 18px 20px 130px;
+    background: var(--canvas);
+    color: var(--secondary);
+    font-size: 12px;
+    line-height: 1.75;
+}
+
+.footer__contact {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.footer__contact a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.footer__contact a .icon {
+    width: 17px;
+}
+
+/* 지도 화면 */
+.map-heading {
+    padding: 22px 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.map-heading h1 {
+    font-size: 22px;
+    letter-spacing: -0.04em;
+}
+
+.map-heading span {
+    color: var(--secondary);
+    font-size: 13px;
+}
+
+.map-filters {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 10px 20px 8px;
+    overflow-x: auto;
+    scroll-padding-inline: 20px;
+    scrollbar-width: none;
+}
+
+.map-filters::-webkit-scrollbar {
+    display: none;
+}
+
+/* 누르는 영역은 44px, 보이는 칩은 34px — 겉은 날씬하게, 누르기는 그대로 */
+.filter {
+    display: flex;
+    flex: none;
+    align-items: center;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+.filter__face {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 34px;
+    padding: 0 13px 0 10px;
+    border: 1px solid #d3dbd6;
+    border-radius: 17px;
+    background: #fff;
+    color: #3d4a43;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filter__mark {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    flex: none;
+}
+
+.filter__mark svg {
+    position: absolute;
+    inset: 0;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.filter__check {
+    visibility: hidden;
+}
+
+.filter[aria-pressed="true"] .filter__face {
+    border-color: var(--green);
+    background: var(--green);
+    color: #fff;
+}
+
+.filter[aria-pressed="true"] .filter__kind {
+    visibility: hidden;
+}
+
+.filter[aria-pressed="true"] .filter__check {
+    visibility: visible;
+}
+
+.filter:focus-visible {
+    outline: none;
+}
+
+.filter:focus-visible .filter__face {
+    outline: 3px solid #145cb2;
+    outline-offset: 2px;
+}
+
+.map-canvas {
+    margin: 0 12px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--map-bg);
+}
+
+.park-map {
+    width: 100%;
+    height: auto;
+}
+
+.park-map__ground {
+    fill: #d8e6ce;
+    stroke: #9caf93;
+    stroke-width: 2.5;
+}
+
+.park-map__water {
+    fill: #98c1c7;
+}
+
+.map-pin__dot {
+    fill: #406f5c;
+    stroke: #fff;
+    stroke-width: 7;
+}
+
+.map-pin--toilet .map-pin__dot {
+    fill: #41637a;
+}
+
+.map-pin--parking .map-pin__dot {
+    fill: #4b5e6b;
+}
+
+.map-pin--nursing .map-pin__dot {
+    fill: #7a5a2e;
+}
+
+.map-pin--venue .map-pin__dot {
+    fill: #6a4f86;
+}
+
+.map-pin--chosen .map-pin__dot {
+    fill: #166645;
+    stroke-width: 11;
+}
+
+.map-pin__glyph {
+    fill: #fff;
+    font-family: var(--font);
+    font-size: 27px;
+    font-weight: 750;
+    letter-spacing: -1px;
+    pointer-events: none;
+}
+
+.map-pin__hit {
+    fill: transparent;
+    pointer-events: none;
+}
+
+.map-pin[role="button"] {
+    cursor: pointer;
+}
+
+.map-pin[role="button"] .map-pin__hit {
+    pointer-events: all;
+}
+
+.map-pin[role="button"]:focus-visible {
+    outline: none;
+}
+
+.map-pin[role="button"]:focus-visible .map-pin__hit {
+    stroke: #145cb2;
+    stroke-width: 8;
+}
+
+.map-label {
+    fill: #243b2e;
+    font-family: var(--font);
+    font-size: 34px;
+    font-weight: 750;
+    paint-order: stroke;
+    stroke: var(--map-bg);
+    stroke-width: 10;
+    pointer-events: none;
+}
+
+.north {
+    position: absolute;
+    top: 13px;
+    right: 14px;
+    display: grid;
+    justify-items: center;
+    color: #385444;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.north .icon {
+    width: 23px;
+    height: 23px;
+}
+
+.map-attribution {
+    position: absolute;
+    bottom: 6px;
+    left: 10px;
+    padding: 2px 4px;
+    background: #edf1e8e8;
+    color: #45533e;
+    font-size: 10px;
+    letter-spacing: 0;
+}
+
+.map-key {
+    margin: 0;
+    padding: 12px 12px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 14px;
+    list-style: none;
+    color: #344c3d;
+    font-size: 12px;
+}
+
+.map-key li {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.key-dot {
+    padding: 3px 5px;
+    border-radius: 5px;
+    background: #406f5c;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.key-dot--toilet {
+    background: #41637a;
+}
+
+.key-dot--parking {
+    background: #4b5e6b;
+}
+
+.key-dot--nursing {
+    background: #7a5a2e;
+}
+
+.key-dot--venue {
+    background: #6a4f86;
+}
+
+.map-note {
+    padding: 4px 20px;
+    color: var(--secondary);
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+.place-panel {
+    margin: 18px 12px 0;
+    padding: 0 18px 18px;
+    border: 1px solid #e2e7e3;
+    border-radius: 18px;
+    box-shadow: 0 3px 12px #1d35200a;
+    scroll-margin-top: 16px;
+}
+
+.handle {
+    width: 32px;
+    height: 4px;
+    margin: 10px auto 18px;
+    border-radius: 3px;
+    background: #d8dfda;
+}
+
+.place-category {
+    margin-bottom: 5px;
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.place-panel h2 {
+    font-size: 23px;
+    font-weight: 750;
+    letter-spacing: -0.045em;
+}
+
+.place-panel h2:focus {
+    outline: none;
+}
+
+.place-sub {
+    margin-top: 5px;
+    color: var(--secondary);
+    font-size: 13px;
+}
+
+.place-row {
+    margin-top: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.place-row > .icon {
+    width: 19px;
+    height: 19px;
+    margin-top: 2px;
+    color: var(--secondary);
+}
+
+.place-row p {
+    margin-top: 4px;
+    color: var(--secondary);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.place-actions {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.place-actions a {
+    min-height: 48px;
+    flex: 1 1 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid #ccd7cf;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.place-actions a:last-child {
+    border-color: var(--green);
+    background: var(--green);
+    color: #fff;
+}
+
+.place-actions .icon {
+    width: 18px;
+    height: 18px;
+}
+
+.route-note {
+    margin-top: 10px;
+    color: var(--secondary);
+    font-size: 12px;
+}
+
+.other-places {
+    padding: 25px 20px 20px;
+}
+
+.other-places h2 {
+    margin-bottom: 6px;
+    font-size: 18px;
+}
+
+.place-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.other-row {
+    width: 100%;
+    min-height: 64px;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+    text-align: left;
+}
+
+.other-row__badge {
+    min-width: 40px;
+    padding: 6px 4px;
+    border-radius: 8px;
+    background: #406f5c;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.other-row__badge--toilet {
+    background: #41637a;
+}
+
+.other-row__badge--parking {
+    background: #4b5e6b;
+}
+
+.other-row__badge--nursing {
+    background: #7a5a2e;
+}
+
+.other-row__badge--venue {
+    background: #6a4f86;
+}
+
+.other-row > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.other-row h3 {
+    font-size: 15px;
+}
+
+.other-row p {
+    margin-top: 3px;
+    color: var(--secondary);
+    font-size: 13px;
+}
+
+.other-row[aria-current="true"] h3 {
+    color: var(--green);
+}
+
+.other-row .arrow {
+    width: 17px;
+    color: var(--secondary);
+}
+
+.empty-note {
+    padding: 14px 0;
+    color: var(--secondary);
+    font-size: 14px;
+}
+
+.map-sources {
+    margin: 0 20px 20px;
+}
+
+.map-sources > summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--secondary);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.map-sources > summary .icon {
+    width: 16px;
+}
+
+.back-summary {
+    min-height: 48px;
+    margin: 0 20px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 10px;
+    background: var(--canvas);
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.back-summary .icon {
+    width: 18px;
+}
+
+/* 하단 고정 바 */
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    z-index: 20;
+    width: 100%;
+    max-width: 412px;
+    padding: 10px 20px max(14px, env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid var(--line);
+    background: #fffffffa;
+    box-shadow: 0 -4px 18px #22352b06;
+    transform: translateX(-50%);
+}
+
+.bottom-bar__toggle {
+    min-width: 56px;
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: #435b4a;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.bottom-bar__toggle .icon {
+    width: 23px;
+    height: 23px;
+}
+
+.bottom-bar__call {
+    min-height: 52px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 12px;
+    background: var(--green);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.bottom-bar__call .icon {
+    width: 20px;
+    height: 20px;
+}
+
+@media (min-width: 600px) {
+    .app {
+        margin: 28px auto 0;
+        overflow: hidden;
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 0 0 1px #d3dcd5;
+    }
+
+    .bottom-bar {
+        box-shadow: 0 -3px 20px #213c2510;
+    }
+}
+
+@media (max-width: 360px) {
+    .condition {
+        margin-inline: 14px;
+    }
+
+    .condition__summary {
+        padding-inline: 12px;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .condition__text b {
+        font-size: 15px;
+    }
+
+    .condition__dot {
+        margin: 0 3px;
+    }
+
+    .hero__title {
+        font-size: 26px;
+    }
+
+    .top {
+        padding-inline: 16px;
+    }
+
+    .block {
+        padding-inline: 16px;
+    }
+
+    .filter__face {
+        padding-inline: 9px 11px;
+        font-size: 13px;
+    }
+
+    .versus {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
