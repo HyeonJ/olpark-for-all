@@ -12,7 +12,8 @@
     const NEAR_PEAK = 0.9;
     const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
     const WHO_ORDER = ["wheelchair", "stroller", "senior", "visual"];
-    const WHO_LABEL = { wheelchair: "휠체어", stroller: "유모차·아이", senior: "어르신", visual: "시각장애" };
+    // 동행 «유형»을 사람 명칭으로 부른다(관광공사 열린관광·서울동행맵 표기) — 사람 수가 아니라 세는 말을 붙이지 않는다
+    const WHO_LABEL = { wheelchair: "휠체어 이용자", stroller: "유모차·아이 동반", senior: "어르신", visual: "시각장애인" };
     const DEFAULT_FILTERS = {
         wheelchair: ["rental", "toilet", "parking"],
         stroller: ["rental", "nursing", "toilet"],
@@ -307,9 +308,13 @@
             return;
         }
         const labels = whoLabels();
-        const who = labels.length > 1 ? `${labels[0]} 외 ${labels.length - 1}명` : labels[0] || "동행 선택 안 함";
+        // 여러 유형이면 «○○ 등» — 숫자를 붙이면 «1명/1가지» 중 무엇을 세는지가 생긴다(Darren M:n8ax)
+        const who = labels.length > 1 ? `${labels[0]} 등` : labels[0] || "동행 선택 안 함";
         const holiday = when.holidayName ? ` ${esc(when.holidayName)}` : "";
-        const tail = labels.length === 1 ? `${esc(who)} 동행` : esc(who);
+        const tail = esc(who);
+        // aria-label 은 일반 span 에선 낭독되지 않는다 — 누를 수 있는 summary 에 단다
+        document.querySelector(".condition__summary").setAttribute("aria-label",
+            `${when.month}월 ${when.dayNum}일 ${when.weekday}요일${when.holidayName || ""}, ${when.hour}시 도착, ${labels.length ? `함께 가는 분 ${labels.join(", ")}` : "동행 선택 안 함"}`);
         $("condition-text").innerHTML = `<b>${when.month}.${when.dayNum} (${when.weekday})${holiday}</b>${dot}${when.hour}시 도착${dot}${tail}`;
         $("day-kind").innerHTML = dayKindText(when);
     };
