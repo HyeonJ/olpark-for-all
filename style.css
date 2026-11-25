@@ -325,7 +325,7 @@ summary::-webkit-details-marker {
     align-items: center;
     gap: 5px;
     height: 34px;
-    padding: 0 13px 0 10px;
+    padding: 0 14px;
     border: 1px solid #d3dbd6;
     border-radius: 17px;
     background: #fff;
@@ -335,19 +335,12 @@ summary::-webkit-details-marker {
     white-space: nowrap;
 }
 
-/* 미선택은 «+», 선택은 «체크» — 같은 자리에서 바뀌어 켜고 꺼도 버튼 폭이 안 변한다 */
-.pick__mark {
-    position: relative;
+/* 미선택은 글자만, 선택하면 체크가 붙는다 — 한 줄 가로 스크롤이라 폭이 늘어도 다른 줄이 밀리지 않는다 */
+.pick__check {
+    display: none;
     width: 16px;
     height: 16px;
     flex: none;
-}
-
-.pick__mark svg {
-    position: absolute;
-    inset: 0;
-    width: 16px;
-    height: 16px;
     fill: none;
     stroke: currentColor;
     stroke-width: 2.2;
@@ -355,22 +348,15 @@ summary::-webkit-details-marker {
     stroke-linejoin: round;
 }
 
-.pick__check {
-    visibility: hidden;
-}
-
 .pick[aria-pressed="true"] .pick__face {
     border-color: var(--green);
     background: var(--green);
     color: #fff;
-}
-
-.pick[aria-pressed="true"] .pick__plus {
-    visibility: hidden;
+    padding-left: 10px;
 }
 
 .pick[aria-pressed="true"] .pick__check {
-    visibility: visible;
+    display: block;
 }
 
 .pick:focus-visible {
@@ -1150,7 +1136,7 @@ select.field__input {
     align-items: center;
     gap: 5px;
     height: 34px;
-    padding: 0 13px 0 10px;
+    padding: 0 14px;
     border: 1px solid #d3dbd6;
     border-radius: 17px;
     background: #fff;
@@ -1160,41 +1146,32 @@ select.field__input {
     white-space: nowrap;
 }
 
-.filter__mark {
-    position: relative;
+.filter__check {
+    display: none;
     width: 16px;
     height: 16px;
     flex: none;
 }
 
-.filter__mark svg {
-    position: absolute;
-    inset: 0;
+.filter__check svg {
     width: 16px;
     height: 16px;
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.9;
+    stroke-width: 2.2;
     stroke-linecap: round;
     stroke-linejoin: round;
-}
-
-.filter__check {
-    visibility: hidden;
 }
 
 .filter[aria-pressed="true"] .filter__face {
     border-color: var(--green);
     background: var(--green);
     color: #fff;
-}
-
-.filter[aria-pressed="true"] .filter__kind {
-    visibility: hidden;
+    padding-left: 10px;
 }
 
 .filter[aria-pressed="true"] .filter__check {
-    visibility: visible;
+    display: block;
 }
 
 .filter:focus-visible {

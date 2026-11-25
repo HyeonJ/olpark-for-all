@@ -27,13 +27,6 @@
         { kind: "venue", label: "공연장" },
     ];
     const CHIP_SVG = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
-    const FILTER_ICON = {
-        rental: CHIP_SVG("<rect x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"3\"/><path d=\"M8 7V4h8v3\"/>"),
-        toilet: CHIP_SVG("<path d=\"M12 3v18\"/><circle cx=\"7\" cy=\"5\" r=\"1.6\"/><circle cx=\"17\" cy=\"5\" r=\"1.6\"/><path d=\"M5 9h4v6H5zM15 9h4v6h-4z\"/>"),
-        nursing: CHIP_SVG("<path d=\"M9 3h6l-1 4h-4z\"/><rect x=\"8\" y=\"7\" width=\"8\" height=\"14\" rx=\"3\"/>"),
-        parking: CHIP_SVG("<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"4\"/><path d=\"M9 17V7h4a3 3 0 0 1 0 6H9\"/>"),
-        venue: CHIP_SVG("<path d=\"M9 18V5l12-2v13\"/><circle cx=\"6\" cy=\"18\" r=\"3\"/><circle cx=\"18\" cy=\"16\" r=\"3\"/>"),
-    };
     const CHECK_ICON = CHIP_SVG("<path d=\"M5 12.5l4.5 4.5L19 7\"/>");
     const GLYPH = { rental: "대여", toilet: "WC", nursing: "수유", parking: "P", venue: "공연" };
     const KIND_LABEL = {
@@ -408,7 +401,7 @@
     const renderFilters = () => {
         $("map-filters").innerHTML = FILTERS.map((f) =>
             `<button class="filter" type="button" data-kind="${f.kind}" aria-pressed="${state.filters.has(f.kind)}">
-                <span class="filter__face"><span class="filter__mark"><span class="filter__kind">${FILTER_ICON[f.kind]}</span><span class="filter__check">${CHECK_ICON}</span></span>${f.label}</span></button>`).join("");
+                <span class="filter__face"><span class="filter__check">${CHECK_ICON}</span>${f.label}</span></button>`).join("");
         $("map-key").innerHTML = FILTERS.filter((f) => state.filters.has(f.kind)).map((f) =>
             `<li><span class="key-dot key-dot--${f.kind}">${GLYPH[f.kind]}</span>${f.label}</li>`).join("");
     };
