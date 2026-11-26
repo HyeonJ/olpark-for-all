@@ -513,6 +513,12 @@ select.field__input {
     line-height: 1.6;
 }
 
+/* 앞뒤 시간 대안 — 사용자가 실제로 바꿀 수 있는 «행동»이라 부제 안에서 이것만 세운다 */
+.hero__alt {
+    color: var(--green);
+    font-weight: 700;
+}
+
 .event-note {
     margin: 0 24px 20px;
     display: flex;

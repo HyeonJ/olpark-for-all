@@ -153,7 +153,7 @@
         const better = nearbyBetter(rows, pick);
         const base = `작년 ${season} ${when.dayType} 기준이에요.`;
         const hint = better
-            ? `${shiftWord(pick.hour, better.hour)}(${hourWord(better.hour)}) 오면 차가 약 ${Math.round((1 - better.median / pick.median) * 100)}% 적었어요.`
+            ? `<strong class="hero__alt">${shiftWord(pick.hour, better.hour)}(${hourWord(better.hour)})</strong> 오면 차가 약 ${Math.round((1 - better.median / pick.median) * 100)}% 적었어요.`
             : `앞뒤 ${NEAR_WINDOW}시간 중에는 이때가 한산한 편이에요.`;
         return {
             title: `${hourWord(when.hour)}는<br><strong>하루 중 차가 ${dayPosition(rows, pick)}</strong>`,
