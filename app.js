@@ -11,7 +11,7 @@
     const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
     const WHO_ORDER = ["wheelchair", "stroller", "senior", "visual"];
     // 동행 «유형»을 사람 명칭으로 부른다(관광공사 열린관광·서울동행맵 표기) — 사람 수가 아니라 세는 말을 붙이지 않는다
-    const WHO_LABEL = { wheelchair: "휠체어 이용자", stroller: "유모차·아이 동반", senior: "어르신", visual: "시각장애인" };
+    const WHO_LABEL = { wheelchair: "휠체어", stroller: "유모차·아이 동반", senior: "어르신", visual: "시각장애인" };
     const DEFAULT_FILTERS = {
         wheelchair: ["rental", "toilet", "parking"],
         stroller: ["rental", "nursing", "toilet"],
