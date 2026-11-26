@@ -8,7 +8,7 @@
     <meta name="description" content="휠체어·유모차·어르신과 함께 올림픽공원에 가기 전, 공식 공공데이터로 준비할 것을 확인해요.">
     <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-    <link rel="stylesheet" href="style.css?v=202611261640r">
+    <link rel="stylesheet" href="style.css?v=202611261800s">
 </head>
 <body>
     <a class="skip-link" href="#main">본문 바로가기</a>
@@ -91,21 +91,22 @@
 
         <main id="main">
             <div id="view-summary" class="view">
-                <div class="hero" aria-live="polite">
-                    <span class="tag">작년 기록</span>
-                    <h1 id="hero-title" class="hero__title">불러오는 중…</h1>
-                    <p id="hero-sub" class="hero__sub"></p>
-                    <p class="hero__event">
-                        <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
-                        <span>그날 공연·행사는 이 비교에 반영되지 않았어요 · <a href="https://www.ksponco.or.kr/olympicpark/menu.es?mid=a20301000000" target="_blank" rel="noopener">공연 일정 보기</a></span>
-                    </p>
-                </div>
+                <div id="applied" class="applied" role="status" hidden></div>
+                <section id="plan" class="plan" aria-labelledby="plan-title">
+                    <div class="plan__head">
+                        <p class="plan__eyebrow"><span id="plan-who">이번 방문</span><button id="plan-edit" class="plan__edit" type="button">조건 바꾸기</button></p>
+                        <h1 id="plan-title" class="plan__title">불러오는 중…</h1>
+                    </div>
+                    <div id="plan-time" class="plan__row"></div>
+                    <div id="plan-places" class="plan__row" hidden></div>
+                    <div id="plan-call" class="plan__row" hidden></div>
+                </section>
+                <p class="hero__event">
+                    <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+                    <span><span id="plan-basis">작년 기록과 비교했어요.</span> 그날 공연·행사는 반영되지 않았어요 · <a href="https://www.ksponco.or.kr/olympicpark/menu.es?mid=a20301000000" target="_blank" rel="noopener">공연 일정 보기</a></span>
+                </p>
 
-                <section id="rental-call" class="rental-call" aria-labelledby="rental-title"></section>
-
-                <section id="flow" class="block flow" aria-labelledby="flow-title"></section>
-
-                <section id="stay" class="block stay" aria-labelledby="stay-title" hidden></section>
+                <p class="details-head">자세히 보기</p>
 
                 <section class="block prep" aria-labelledby="prepare-title">
                     <h2 id="prepare-title">꼭 필요한 것</h2>
@@ -114,6 +115,10 @@
                     <ul id="must-list" class="must-list"></ul>
                     <div id="call-summary" class="call-summary" hidden></div>
                 </section>
+
+                <section id="stay" class="block stay" aria-labelledby="stay-title" hidden></section>
+
+                <section id="flow" class="block flow" aria-labelledby="flow-title"></section>
 
                 <section class="block map-preview" aria-labelledby="preview-title">
                     <div class="section-head">
@@ -144,6 +149,7 @@
 
             <div id="view-map" class="view" hidden>
                 <h1 id="map-title" class="sr-only">편의시설 지도</h1>
+                <p id="from-must" class="from-must" hidden></p>
                 <div id="map-filters" class="map-filters h-scroll" role="group" aria-label="지도에 표시할 시설"></div>
                 <div class="map-canvas">
                     <div class="north" aria-hidden="true">북<svg class="icon" aria-hidden="true"><use href="#i-north"/></svg></div>
@@ -182,6 +188,6 @@
         <a id="bottom-toggle" class="bottom-bar__toggle" href="#map"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg><span>시설 지도</span></a>
         <a id="bottom-call" class="bottom-bar__call" href="tel:024101114"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg><span id="bottom-call-label">공원 안내 전화하기</span></a>
     </nav>
-    <script src="app.js?v=202611261640r"></script>
+    <script src="app.js?v=202611261800s"></script>
 </body>
 </html>

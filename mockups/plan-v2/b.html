@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light">
+    <title>모두의 올팍</title>
+    <meta name="description" content="휠체어·유모차·어르신과 함께 올림픽공원에 가기 전, 공식 공공데이터로 준비할 것을 확인해요.">
+    <link rel="icon" href="../../assets/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+    <link rel="stylesheet" href="../../style.css?v=202611261640r">
+    <link rel="stylesheet" href="plan.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">본문 바로가기</a>
+    <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+            <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+            <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+            <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18"/></symbol>
+            <symbol id="i-phone" viewBox="0 0 24 24"><path d="m5 3 4 4-2 3a15 15 0 0 0 7 7l3-2 4 4-2 3C10 23 1 14 2 5Z"/></symbol>
+            <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+            <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Zm6-2v16m6-14v16"/></symbol>
+            <symbol id="i-bag" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="M8 7V4h8v3m-8 7h8m-4-4v8"/></symbol>
+            <symbol id="i-door" viewBox="0 0 24 24"><path d="M3 21h18M6 21V4h12v17m-4-9h.01"/></symbol>
+            <symbol id="i-ramp" viewBox="0 0 24 24"><path d="M3 20h18L3 9v11ZM5 5l14 8"/></symbol>
+            <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></symbol>
+            <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+            <symbol id="i-north" viewBox="0 0 24 24"><path d="m6 11 6-8 6 8m-6-8v18"/></symbol>
+            <symbol id="i-parking" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></symbol>
+            <symbol id="i-braille" viewBox="0 0 24 24"><circle cx="8" cy="6" r="1.6"/><circle cx="16" cy="6" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/></symbol>
+            <symbol id="i-stroller" viewBox="0 0 24 24"><path d="M4 4h2.5l1.6 10H17a4 4 0 0 0 4-4V7H7.2"/><circle cx="9" cy="19" r="1.7"/><circle cx="17" cy="19" r="1.7"/></symbol>
+            <symbol id="i-bottle" viewBox="0 0 24 24"><path d="M10 3h4v3h-4zM9 9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2zM9 13h6"/></symbol>
+            <symbol id="i-toilet" viewBox="0 0 24 24"><path d="M7 3h10v5H7zM5 11h14a7 7 0 0 1-7 7 7 7 0 0 1-7-7zM9 18l-1 3m8-3 1 3"/></symbol>
+            <symbol id="i-music" viewBox="0 0 24 24"><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/><path d="M9 18V6l11-2v12"/></symbol>
+            <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></symbol>
+        </defs>
+    </svg>
+
+    <div class="app">
+        <header class="top">
+            <a class="brand" href="#summary" aria-label="모두의 올팍 방문 요약">
+                <img class="brand__logo" src="../../assets/logo.svg" alt="" width="32" height="32">
+                <span>모두의 올팍</span>
+            </a>
+            <a class="park-name" href="#map">올림픽공원<svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg></a>
+        </header>
+
+        <nav class="tabs" aria-label="화면 이동">
+            <a id="tab-summary" class="tabs__link" href="#summary" aria-current="page">방문 요약</a>
+            <a id="tab-map" class="tabs__link" href="#map">편의시설 지도</a>
+        </nav>
+
+        <details class="condition">
+            <summary class="condition__summary" aria-label="11월 28일 토요일, 오전 10시 도착, 머무는 시간 3시간, 함께 가는 분 휠체어">
+                <svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg>
+                <span id="condition-text" class="condition__text"><b>11.28 (토)</b><span class="condition__dot">·</span>오전 10시~오후 1시<span class="condition__dot">·</span>휠체어</span>
+                <svg class="icon arrow" aria-hidden="true"><use href="#i-down"></use></svg>
+            </summary>
+            <div class="condition__body">
+                <fieldset class="condition__group">
+                    <legend class="condition__legend">함께 가는 분 (여러 명 선택 가능)</legend>
+                    <div class="condition__picks h-scroll has-more-end">
+                        <button class="pick" type="button" data-who="wheelchair" aria-pressed="true"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>휠체어</span></button>
+                        <button class="pick" type="button" data-who="stroller" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>유모차·아이 동반</span></button>
+                        <button class="pick" type="button" data-who="senior" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>어르신</span></button>
+                        <button class="pick" type="button" data-who="visual" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>시각장애인</span></button>
+                    </div>
+                </fieldset>
+                <div class="condition__row">
+                    <label class="field">
+                        <span>날짜</span>
+                        <span class="date-field">
+                            <span id="visit-date-shown" class="field__input date-field__shown" aria-hidden="true">11월 28일 (토)</span>
+                            <input id="visit-date" class="date-field__native" type="date">
+                        </span>
+                    </label>
+                </div>
+                <div class="condition__row condition__row--pair">
+                    <label class="field">
+                        <span>도착 시각</span>
+                        <select id="visit-hour" class="field__input"><option value="6">오전 6시</option><option value="7">오전 7시</option><option value="8">오전 8시</option><option value="9">오전 9시</option><option value="10">오전 10시</option><option value="11">오전 11시</option><option value="12">낮 12시</option><option value="13">오후 1시</option><option value="14">오후 2시</option><option value="15">오후 3시</option><option value="16">오후 4시</option><option value="17">오후 5시</option><option value="18">오후 6시</option><option value="19">오후 7시</option><option value="20">오후 8시</option><option value="21">오후 9시</option></select>
+                    </label>
+                    <label class="field">
+                        <span>머무는 시간</span>
+                        <select id="visit-stay" class="field__input"><option value="1">1시간</option><option value="2">2시간</option><option value="3">3시간</option><option value="4">4시간</option></select>
+                    </label>
+                </div>
+                <p id="day-kind" class="condition__note">주말이라 주말·휴일 기록과 비교해요.</p>
+            </div>
+        </details>
+<main id="main"><div class="view"><h1 class="sr-only">이번 방문 준비</h1>
+<ol class="steps">
+  <li class="step"><span class="step__no">1</span><h2>언제 갈지 정하기</h2><div class="step__body"><p class="plan__text">오전 10시 도착은 차량이 <strong>보통 수준</strong>이었어요</p>
+<p class="plan__sub">1시간 일찍 와서 오전 9시~낮 12시에 머물면 차가 약 10% 적었어요</p>
+<div class="plan__actions"><a class="btn btn--primary" href="a-applied.html">오전 9시 도착으로 바꾸기</a><a class="btn btn--ghost" href="#stay">시간대별 비교</a></div></div></li>
+  <li class="step"><span class="step__no">2</span><h2>필요한 곳 위치 보기</h2><div class="step__body" style="padding:10px"><div class="plan__places">
+  <a class="place-chip" href="map.html"><span class="place-chip__badge">대여</span><span><strong>평화의광장 공원안내센터</strong><small>휠체어 대여 · 위치 보기</small></span><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></a>
+  <a class="place-chip" href="map.html"><span class="place-chip__badge">대여</span><span><strong>동1문 안내센터(만남의광장)</strong><small>휠체어 대여 · 위치 보기</small></span><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></a>
+  <a class="place-chip" href="#"><span class="place-chip__badge place-chip__badge--wc">WC</span><span><strong>휠체어 화장실 4곳</strong><small>오픈스트리트맵 등록 · 현장 확인 전</small></span><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></a>
+</div></div></li>
+  <li class="step"><span class="step__no step__no--todo">3</span><h2>출발 전 전화로 물어보기</h2><div class="step__body"><ol style="margin:0;padding-left:18px;font-size:15px;line-height:1.7"><li>휠체어 당일 대여 가능 여부</li><li>도착할 곳 근처 장애인 화장실</li><li>장애인 전용 주차면 수</li></ol><div class="plan__actions"><a class="btn btn--primary" href="#"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>02-410-1114 전화하기</a></div></div></li>
+</ol>
+<p class="hero__event" style="margin:4px 20px 0"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg><span>작년 가을 주말·휴일 기록과 비교했어요. 그날 공연·행사는 반영되지 않았어요 · <a href="#">공연 일정 보기</a></span></p><p class="details-head">자세히 보기</p><section id="stay" class="block stay" aria-labelledby="stay-title"><div class="section-head"><h2 id="stay-title">머무는 동안의 차량</h2></div>
+            <p class="stay__lead">오전 10시~오후 1시 머무는 동안 평균 <strong>1,557대</strong> · 작년 가을 주말·휴일 15일 기준</p>
+            <ul class="window-list" aria-label="같은 3시간을 다른 시각에 머물렀을 때 평균 주차대수"><li class="window window--best"><span class="window__label">오전 9시~낮 12시<small class="window__tag">가장 적음</small></span>
+            <span class="window__bar" aria-hidden="true"><span class="window__fill" style="width:81.0%"></span></span>
+            <span class="window__num">1,405대</span></li><li class="window window--pick"><span class="window__label">오전 10시~오후 1시<span class="window__sr"> (고른 시간)</span></span>
+            <span class="window__bar" aria-hidden="true"><span class="window__fill" style="width:89.8%"></span></span>
+            <span class="window__num">1,557대</span></li><li class="window"><span class="window__label">오후 4시~7시</span>
+            <span class="window__bar" aria-hidden="true"><span class="window__fill" style="width:100.0%"></span></span>
+            <span class="window__num">1,734대</span></li><li class="window"><span class="window__label">오후 5시~8시</span>
+            <span class="window__bar" aria-hidden="true"><span class="window__fill" style="width:84.8%"></span></span>
+            <span class="window__num">1,470대</span></li></ul>
+            <p class="comparison"><strong>오전 9시~낮 12시</strong>에 머물면 차가 약 10% 적었어요</p>
+            <p class="source-line">과거 같은 조건의 시간대별 중앙값을 평균한 값이에요. 방문일 예측이 아니고, 대여 운영시간·해 지는 시간은 반영하지 않았어요.</p></section>
+
+                <section id="flow" class="block flow" aria-labelledby="flow-title"><div class="section-head"><h2 id="flow-title">오전 10시 주차대수</h2></div>
+            <div class="metric"><strong>1,423<small>대</small></strong><span>작년 중앙값</span></div>
+            <p class="range">작년 기록의 가운데 절반은 1,180~2,198대였어요</p>
+            <svg class="chart" viewBox="0 0 350 202" role="img" aria-label="2025년 시간대별 주차대수 중앙값. 10시 1,423대. 점선은 상위 1/3 경계 2,036대. 과거 비교예요.">
+            <path class="chart__grid" d="M24 168H324M24 112H324"></path>
+            <path class="chart__area" d="M24.0,144.9 L44.0,136.9 L64.0,122.1 L84.0,107.6 L104.0,99.7 L124.0,94.4 L144.0,85.8 L164.0,71.4 L184.0,58.4 L204.0,56.0 L224.0,67.5 L244.0,86.5 L264.0,100.5 L284.0,105.4 L304.0,129.6 L324.0,144.2 L324.0,168 L24.0,168Z"></path>
+            <path class="chart__threshold" d="M24 70.3H324"></path>
+            <text class="chart__threshold-label" x="324" y="63.3" text-anchor="end">상위 1/3 경계 2,036대</text>
+            <path class="chart__line" d="M24.0,144.9 L44.0,136.9 L64.0,122.1 L84.0,107.6 L104.0,99.7 L124.0,94.4 L144.0,85.8 L164.0,71.4 L184.0,58.4 L204.0,56.0 L224.0,67.5 L244.0,86.5 L264.0,100.5 L284.0,105.4 L304.0,129.6 L324.0,144.2"></path>
+            <path class="chart__cursor" d="M104.0 26V168"></path>
+            <circle class="chart__point" cx="104.0" cy="99.7" r="5"></circle>
+            <rect class="chart__tag" x="78.0" y="2" width="52" height="24" rx="4"></rect>
+            <text class="chart__tag-text" x="104.0" y="19" text-anchor="middle">10시</text><text x="24.0" y="193" text-anchor="middle">6시</text><text x="84.0" y="193" text-anchor="middle">9시</text><text x="144.0" y="193" text-anchor="middle">12시</text><text x="204.0" y="193" text-anchor="middle">15시</text><text x="264.0" y="193" text-anchor="middle">18시</text><text x="324.0" y="193" text-anchor="middle">21시</text></svg>
+            <p class="comparison">가장 많았던 때: <strong>오후 3시 2,334대</strong><br>가장 적었던 때(9~19시): <strong>오전 9시 1,259대</strong></p>
+            <p class="source-line">한국체육산업개발 · 2025년 가을 주말·휴일 15일<br>같은 조건의 과거 비교이며, 방문일의 예측은 아니에요.</p>
+            <details class="data-detail"><summary class="data-detail__summary">범위와 기준 보기<svg class="icon" aria-hidden="true"><use href="#i-down"></use></svg></summary>
+            <div class="detail-body">
+                <p>1,423대는 15일 기록의 <strong>중앙값</strong>이에요. 가운데 절반의 날은 1,180~2,198대였고, 가장 적은 날은 433대, 가장 많은 날은 2,701대였어요.</p>
+                <p>점선은 <strong>상위 1/3 경계 2,036대</strong>예요. 작년 6~21시 관측값 전체를 크기순으로 나눴을 때 큰 쪽 3분의 1이 시작되는 값이에요. 가운데 절반의 범위와는 다른 기준이고, 선을 넘는다고 해서 어떤 상태라고 단정하지는 않아요.</p>
+                <p>주차된 차량 대수예요. 남은 주차면 수나 방문객 수를 뜻하지 않아요.</p>
+                <table class="chart-table"><caption>6~21시 주차대수 중앙값</caption>
+            <thead><tr><th scope="col">시간</th><th scope="col">주차대수</th><th scope="col">시간</th><th scope="col">주차대수</th></tr></thead>
+            <tbody><tr><th scope="row">6시</th><td>481대</td><th scope="row">14시</th><td>2,285대</td></tr><tr><th scope="row">7시</th><td>648대</td><th scope="row">15시</th><td>2,334대</td></tr><tr><th scope="row">8시</th><td>957대</td><th scope="row">16시</th><td>2,095대</td></tr><tr><th scope="row">9시</th><td>1,259대</td><th scope="row">17시</th><td>1,699대</td></tr><tr><th scope="row">10시</th><td>1,423대</td><th scope="row">18시</th><td>1,407대</td></tr><tr><th scope="row">11시</th><td>1,534대</td><th scope="row">19시</th><td>1,305대</td></tr><tr><th scope="row">12시</th><td>1,713대</td><th scope="row">20시</th><td>801대</td></tr><tr><th scope="row">13시</th><td>2,014대</td><th scope="row">21시</th><td>496대</td></tr></tbody></table>
+            </div></details></section>
+
+                <section class="block prep" aria-labelledby="prepare-title">
+                    <h2 id="prepare-title">꼭 필요한 것</h2>
+                    <p class="prep__intro">없으면 곤란한 것만 골라 주세요. 확인된 것과 아직 모르는 것을 나눠 보여드려요.</p>
+                    <div id="must-picks" class="must-picks h-scroll has-more-end" role="group" aria-label="꼭 필요한 것 고르기"><button class="pick must-pick" type="button" data-must="wheelchair" aria-pressed="true"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>휠체어 대여</span></button><button class="pick must-pick" type="button" data-must="stroller" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>유모차 대여</span></button><button class="pick must-pick" type="button" data-must="restroom" aria-pressed="true"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>장애인 화장실</span></button><button class="pick must-pick" type="button" data-must="parking" aria-pressed="true"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>장애인 주차</span></button><button class="pick must-pick" type="button" data-must="nursing" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>수유실</span></button><button class="pick must-pick" type="button" data-must="entrance" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>턱 없는 출입구</span></button><button class="pick must-pick" type="button" data-must="ramp" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>경사로</span></button><button class="pick must-pick" type="button" data-must="braille" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>점자 안내</span></button></div>
+                    <ul id="must-list" class="must-list"><li class="must"><span class="must__name">휠체어 대여</span>
+            <span class="must__state must__state--ok">확인됨</span>
+            <span class="must__detail">평화의광장 앞 공원안내센터, 만남의 광장 내 동1문 안내센터</span><span class="must__todo"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>당일 빌릴 수 있는지는 공개되지 않아요 → 전화로 확인</span><a class="must__link" href="#map">지도에서 위치 보기<svg class="icon" aria-hidden="true"><use href="#i-right"></use></svg></a></li><li class="must"><span class="must__name">장애인 화장실</span>
+            <span class="must__state must__state--none">위치 공식 자료 없음</span>
+            <span class="must__detail">관광공사 자료엔 «있음»만 있고, 위치는 오픈스트리트맵 등록 4곳(현장 확인 전)</span><span class="must__todo"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>도착할 곳 근처에 있는지 → 전화로 확인</span><a class="must__link" href="#map">지도에서 위치 보기<svg class="icon" aria-hidden="true"><use href="#i-right"></use></svg></a></li><li class="must"><span class="must__name">장애인 주차</span>
+            <span class="must__state must__state--diff">출처마다 다름</span>
+            <span class="must__detail">관광공사 자료 «장애인 주차장 140칸 있음» · 관광공사 누리집 «주차 개수 : 140»</span><span class="must__todo"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>140칸이 장애인 전용인지 → 전화로 확인</span></li></ul>
+                    <div id="call-summary" class="call-summary"><strong>전화 한 번에 물어볼 것 3가지</strong> <span class="nowrap">· 공원 안내 02-410-1114</span>
+        <ol><li>휠체어 당일 대여 가능 여부</li><li>도착할 곳 근처 장애인 화장실</li><li>장애인 전용 주차면 수</li></ol></div>
+                </section>
+
+                <section class="block map-preview" aria-labelledby="preview-title">
+                    <div class="section-head">
+                        <h2 id="preview-title">편의시설 위치</h2>
+                        <a href="#map">지도 보기<svg class="icon" aria-hidden="true"><use href="#i-right"></use></svg></a>
+                    </div>
+                    <a id="map-thumb" class="map-thumb" href="#map" aria-label="편의시설 지도 보기"><svg class="park-map" viewBox="-65 -85 1130 1100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path class="park-map__ground" d="M0.0,518.0L17.1,526.0L18.0,528.5L25.1,548.4L33.5,571.9L34.6,574.9L29.4,587.1L514.3,802.6L775.1,937.0L782.4,943.3L795.3,944.0L812.9,937.0L823.4,927.3L949.3,687.7L990.1,608.1L1000.0,591.2L937.2,557.9L917.8,543.9L907.0,526.8L896.5,502.7L880.4,400.1L864.2,359.2L861.4,350.5L840.7,307.7L818.2,272.3L809.6,242.2L803.6,195.6L798.4,185.9L793.3,174.0L795.3,162.3L801.1,152.0L807.6,145.9L816.6,143.2L791.8,129.4L761.5,112.6L584.2,14.9L535.7,4.8L457.0,0.0L422.5,5.6L364.0,19.0L347.5,24.3L331.0,27.4L314.3,28.9L297.6,29.2L274.5,27.5L251.3,23.3L229.5,37.8L0.0,518.0Z"></path><path class="park-map__water" d="M70.8,515.0L71.0,514.8L71.1,514.6L71.1,514.3L71.2,514.1L71.1,513.8L74.3,512.6L74.4,512.8L74.5,512.9L74.7,513.1L74.9,513.3L75.1,513.4L75.3,513.5L75.6,513.5L75.8,513.5L76.1,513.4L76.3,513.4L76.5,513.2L76.7,513.1L76.9,512.9L77.1,512.7L77.2,512.4L77.2,512.2L77.2,511.9L77.2,511.6L80.2,510.5L80.3,510.6L80.4,510.8L80.6,511.0L80.8,511.2L81.0,511.3L81.3,511.3L81.5,511.4L81.8,511.4L82.0,511.3L82.3,511.2L82.5,511.1L82.7,511.0L82.8,510.8L83.0,510.6L83.1,510.3L83.1,510.1L83.2,509.8L83.1,509.5L87.8,507.8L99.3,539.6L94.7,541.4L94.5,541.2L94.3,541.1L94.1,541.0L93.8,540.9L93.6,540.9L93.3,540.9L93.0,540.9L92.8,541.0L92.6,541.2L92.4,541.3L92.2,541.5L92.1,541.8L92.0,542.0L92.0,542.3L88.7,543.5L88.5,543.3L88.3,543.2L88.1,543.0L87.8,543.0L87.6,542.9L87.3,542.9L87.1,543.0L86.8,543.1L86.6,543.2L86.4,543.4L86.2,543.6L86.1,543.8L86.0,544.1L86.0,544.3L86.0,544.6L82.7,545.7L82.5,545.5L82.3,545.3L82.1,545.2L81.8,545.1L81.6,545.1L81.4,545.1L70.7,515.2L70.8,515.0Z"></path><path class="park-map__water" d="M-742.6,105.6L-751.7,126.4L-759.5,143.6L-728.8,141.7L-660.3,140.4L-410.5,135.6L-21.6,127.3L-13.7,127.0L-7.8,126.2L-4.2,125.3L0.1,125.1L3.8,126.2L8.5,128.4L11.6,128.9L14.9,129.3L72.3,131.2L145.8,133.6L189.2,138.6L233.7,142.1L312.6,125.9L324.2,127.3L333.5,121.7L340.2,116.8L346.6,114.9L352.4,110.6L354.9,104.6L360.8,87.1L365.5,80.9L380.1,69.7L397.8,58.1L411.9,51.3L427.0,48.6L456.0,58.0L470.1,61.9L493.7,59.6L554.4,68.5L584.4,66.8L594.8,64.7L602.3,67.4L707.1,132.5L716.6,139.2L725.2,149.4L737.7,157.1L745.5,162.9L765.1,179.1L776.4,189.5L783.6,194.1L790.3,203.2L794.8,240.0L798.6,264.3L805.0,280.8L815.2,299.0L834.5,329.2L842.1,351.2L840.8,357.8L844.0,365.8L849.6,367.2L864.3,405.9L874.0,458.0L877.0,479.3L879.9,496.6L884.0,512.2L890.4,528.0L898.4,542.1L910.4,557.4L921.1,568.3L933.1,577.3L943.1,581.4L950.3,582.6L957.4,586.3L964.1,591.2L971.4,596.9L978.9,598.7L986.0,601.3L992.5,603.5L1023.9,622.2L1035.6,627.0L1046.1,631.1L1050.6,636.3L1054.9,640.1L1058.9,642.3L1063.2,643.5L1067.1,644.8L1070.8,646.6L1074.7,649.8L1079.3,653.5L1084.9,655.7L1089.5,655.4L1094.2,655.3L1097.7,656.5L1102.2,660.7L1105.7,663.3L1115.3,673.7L1124.2,688.6L1120.1,668.0L1129.7,667.8L1137.9,670.5L1130.1,663.5L1111.7,654.9L1107.5,652.8L1100.9,650.1L1095.8,647.4L1087.4,642.5L1074.3,636.4L1066.0,631.9L1057.8,628.3L1049.4,623.2L1041.5,621.3L1030.2,619.2L1016.1,612.2L992.4,598.6L951.8,576.4L937.5,570.0L926.2,561.7L916.3,551.5L905.2,539.3L898.5,529.2L890.7,513.3L885.5,488.9L881.4,458.6L871.4,403.6L855.3,364.3L840.2,325.0L811.5,278.0L804.3,262.2L795.5,198.5L789.2,181.3L776.0,167.1L763.8,158.8L756.7,145.8L746.0,132.2L733.8,121.1L599.7,50.4L589.2,44.1L575.4,43.3L568.7,44.4L560.0,47.1L551.9,49.5L546.5,51.6L540.5,52.9L426.5,35.1L407.9,38.3L391.1,47.1L369.6,62.1L358.7,69.8L350.4,78.8L346.3,87.1L343.1,95.6L339.1,101.8L332.1,105.6L232.1,124.1L147.3,117.5L54.7,117.1L52.1,116.5L36.8,113.8L27.7,112.1L19.1,111.1L-4.7,110.4L-7.0,110.4L-19.5,108.9L-21.1,109.1L-26.2,111.2L-29.0,111.6L-47.9,112.7L-170.5,120.6L-375.3,119.8L-378.0,118.4L-385.8,121.1L-394.7,121.1L-396.5,119.4L-403.3,119.4L-406.8,116.7L-403.3,104.2L-406.5,102.2L-407.7,96.9L-416.1,96.8L-418.7,104.8L-423.1,113.8L-427.1,116.7L-433.4,117.7L-451.8,117.6L-463.6,118.5L-474.4,118.5L-482.4,120.0L-487.4,115.7L-487.2,107.5L-494.4,110.2L-494.0,112.5L-498.8,114.7L-501.8,115.0L-504.2,113.5L-507.6,118.3L-511.2,120.1L-523.2,117.9L-530.6,119.9L-543.3,119.0L-549.4,121.4L-553.4,128.3L-577.8,129.4L-594.1,119.2L-603.5,119.3L-619.7,114.7L-632.1,111.2L-643.5,108.4L-649.2,107.1L-694.8,108.8L-710.9,110.3L-736.2,110.7L-737.7,110.6L-739.3,110.6L-741.6,109.5L-742.4,108.3L-742.6,105.6Z"></path><path class="park-map__water" d="M693.0,228.9L693.1,233.0L693.6,240.1L693.3,257.2L691.8,265.3L688.1,270.4L683.0,274.5L676.6,280.1L673.5,285.3L673.9,289.8L674.6,294.4L675.6,301.1L675.1,306.8L673.5,311.3L672.2,312.3L670.8,312.3L669.3,311.7L667.9,311.4L666.4,311.6L664.8,312.7L663.8,313.8L663.5,314.5L663.2,315.6L662.9,316.5L662.4,317.2L661.7,318.0L659.4,318.3L655.3,318.1L650.6,317.0L643.9,313.3L638.9,309.0L635.3,303.4L630.8,291.7L621.5,271.7L622.4,262.2L626.2,255.8L631.5,251.3L639.6,249.6L647.8,246.6L652.8,242.1L655.8,234.5L660.2,230.4L667.4,227.1L674.3,223.1L688.8,217.5L705.4,212.8L717.4,208.1L731.2,200.0L739.1,193.5L744.9,184.5L747.6,178.0L748.3,170.7L747.8,166.8L745.5,162.9L765.1,179.1L761.0,178.5L757.8,179.2L753.6,182.3L749.7,187.4L742.4,198.5L735.7,204.5L696.4,225.2L693.0,228.9Z"></path><path class="park-map__water" d="M415.6,628.5L414.6,629.2L413.4,629.6L412.2,629.5L411.0,629.1L410.1,628.4L409.4,627.3L409.1,626.2L409.1,624.9L409.6,623.7L410.5,622.8L411.6,622.2L412.9,622.0L414.2,622.2L415.3,622.8L416.1,623.8L416.6,625.0L416.6,626.3L416.3,627.5L415.6,628.5Z"></path><path class="park-map__water" d="M229.2,526.7L226.5,517.4L231.8,509.0L234.3,500.8L235.2,490.9L234.4,482.5L231.2,472.7L226.3,465.1L221.4,459.3L216.5,454.9L210.7,451.4L204.5,448.9L199.7,447.8L196.4,440.1L200.3,437.4L202.4,433.2L203.6,428.0L203.3,422.6L200.5,416.1L197.0,412.4L192.8,409.2L188.2,408.1L185.3,407.2L178.5,388.3L193.4,358.8L197.0,360.6L203.6,345.6L200.0,343.8L206.7,331.7L213.0,321.5L216.6,314.3L217.8,301.9L215.1,294.1L214.5,283.9L211.5,270.3L212.4,254.7L214.8,248.0L220.8,236.0L222.6,227.0L223.2,217.0L220.8,208.9L219.3,202.0L221.4,195.4L221.3,190.5L224.3,186.7L230.8,187.4L242.1,188.5L250.4,187.6L262.9,179.1L269.7,185.1L260.7,193.9L253.6,200.5L248.5,206.2L241.7,223.8L237.9,237.8L233.3,253.3L230.4,262.5L226.5,273.6L225.9,281.5L225.7,289.8L226.8,297.1L228.5,304.1L227.1,317.3L223.9,330.1L222.6,346.2L222.9,357.6L223.8,370.9L226.8,383.5L230.1,393.7L235.0,402.8L241.3,409.1L247.3,413.3L252.7,414.5L257.2,416.3L261.4,420.2L263.8,425.0L264.7,431.7L263.8,438.0L263.8,444.9L264.7,449.7L272.0,466.3L274.7,469.6L278.9,472.3L283.4,474.4L287.0,479.2L290.9,486.7L291.5,491.6L281.3,530.4Z"></path><path class="park-map__water" d="M281.3,530.4L280.1,536.4L280.1,541.2L281.9,547.0L285.5,556.3L291.0,567.8L301.2,579.5L312.3,586.1L320.7,592.1L325.9,598.4L328.3,603.6L328.0,606.6L323.8,607.8L316.2,606.4L318.2,601.7L297.3,592.3L295.2,597.8L245.1,576.3L239.5,558.4Z"></path><path class="park-map__water" d="M239.5,558.4L242.5,555.8L244.7,553.3L246.3,549.8L246.9,545.7L246.9,541.2L246.1,538.1L244.9,535.1L243.3,533.0L240.0,529.9L236.1,527.8L232.9,526.9L229.2,526.7Z"></path><g class="map-pin map-pin--rental">
+            <circle class="map-pin__dot" cx="146.8" cy="466.5" r="38"></circle>
+            <text class="map-pin__glyph" x="146.8" y="476.5" text-anchor="middle">대여</text></g><g class="map-pin map-pin--rental">
+            <circle class="map-pin__dot" cx="896" cy="610.8" r="38"></circle>
+            <text class="map-pin__glyph" x="896" y="620.8" text-anchor="middle">대여</text></g><g class="map-pin map-pin--toilet">
+            <circle class="map-pin__dot" cx="419" cy="322.2" r="38"></circle>
+            <text class="map-pin__glyph" x="419" y="332.2" text-anchor="middle">WC</text></g><g class="map-pin map-pin--toilet">
+            <circle class="map-pin__dot" cx="687.2" cy="381.6" r="38"></circle>
+            <text class="map-pin__glyph" x="687.2" y="391.6" text-anchor="middle">WC</text></g><g class="map-pin map-pin--toilet">
+            <circle class="map-pin__dot" cx="411.7" cy="600.9" r="38"></circle>
+            <text class="map-pin__glyph" x="411.7" y="610.9" text-anchor="middle">WC</text></g><g class="map-pin map-pin--toilet">
+            <circle class="map-pin__dot" cx="183.3" cy="535.1" r="38"></circle>
+            <text class="map-pin__glyph" x="183.3" y="545.1" text-anchor="middle">WC</text></g><g class="map-pin map-pin--parking">
+            <circle class="map-pin__dot" cx="600.3" cy="760.1" r="38"></circle>
+            <text class="map-pin__glyph" x="600.3" y="770.1" text-anchor="middle">P</text></g><text class="map-label" x="116.80000000000001" y="408.5" text-anchor="start">평화의광장</text><text class="map-label" x="926" y="552.8" text-anchor="end">동1문</text><text class="map-label" x="600.3" y="702.1" text-anchor="middle">남2문 주차장</text></svg></a>
+                    <a class="map-preview__more" href="#map">지도 크게 보기<svg class="icon" aria-hidden="true"><use href="#i-right"></use></svg></a>
+                    <p class="map-preview__note">휠체어 이용 가능으로 등록된 화장실은 오픈스트리트맵 기준이고 현장 확인 전이에요. 공원 안 이동 경로는 안내하지 않아요.</p>
+                </section>
+
+                <section class="block live" aria-labelledby="live-title">
+                    <div class="section-head">
+                        <h2 id="live-title">실시간 주차 현황</h2>
+                    </div>
+                    <div id="live-body" aria-live="polite"><p class="live-number">2,026<small>대</small><span>주차 중</span></p>
+                <p class="source-line">16:51 조회 · 동2·남2·북2 합계 · 한국체육산업개발</p></div>
+                    <p class="live-notice">
+                        <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+                        <span>남은 주차 공간이나 방문일의 예상 대수가 아니에요.</span>
+                    </p>
+                </section>
+
+                <details class="sources">
+                    <summary>데이터 출처와 기준<svg class="icon" aria-hidden="true"><use href="#i-down"></use></svg></summary>
+                    <div id="sources-body" class="detail-body">
+            <p><strong>시간대별 차량 기록</strong><br>한국체육산업개발(주)_올림픽공원 2025 차량입출차, 공연, 날씨정보 등 연계 데이터 (문화공공데이터광장 API_CPM_009). 2025년 기록 중 주차대수만 썼어요. 같은 계절·같은 날 종류(평일 또는 주말·휴일)의 시간대별 중앙값을 비교해요.</p>
+            <p><strong>제외한 날</strong><br>수집 이상이나 집계 변경이 의심되는 102일을 뺐어요. 관측 20시간 미만 41일, 값이 날마다 줄어드는 수집 장애 의심 40일, 집계 범위가 바뀐 것으로 보이는 2025-08·2025-09 61일이에요(두 가지 이상에 걸린 날은 겹쳐 세어져요).</p>
+            <p><strong>방문객 수를 쓰지 않은 이유</strong><br>원자료의 방문객 수가 주차대수에 고정 배율을 곱한 값이었어요(주말·휴일 ×5.0 2,579건, 평일 ×3.0 5,224건).</p>
+            <p><strong>편의시설</strong><br>한국관광공사 무장애 여행 정보(공공데이터 API)와 관광공사 누리집을 대조했어요. 웹 수정 2026-11-10, 대조 2026-11-25. 출처마다 다른 수량·표현은 각각 보여 드려요.</p>
+            <p><strong>시설 지도</strong><br>© OpenStreetMap contributors. 휠체어 화장실은 휠체어 이용 가능으로 등록된 지점이며 현장 검증 전이에요. 경사도·노면·연속된 무장애 동선은 확인되지 않았어요.</p>
+            <p><strong>공휴일</strong><br>한국천문연구원 특일 정보 (2026·2027년).</p>
+            
+            <p><strong>실시간 주차 현황</strong><br>한국체육산업개발 실시간 주차현황의 동2·남2·북2 합계예요. 불러온 시각을 함께 보여 드려요.</p></div>
+                </details>
+            </div></main>
+<footer class="footer">
+            <div class="footer__contact">
+                <span>올림픽공원 안내</span>
+                <a href="tel:024101114"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>02-410-1114</a>
+            </div>
+            <p>한국체육산업개발 2026 공공데이터 활용 경진대회 출품작</p>
+            <p>지도 © OpenStreetMap contributors</p>
+        </footer>
+    </div>
+
+    <nav class="bottom-bar" aria-label="빠른 행동">
+        <a id="bottom-toggle" class="bottom-bar__toggle" href="#map"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg><span>시설 지도</span></a>
+        <a id="bottom-call" class="bottom-bar__call" href="tel:024101114"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg><span id="bottom-call-label">공원 안내 전화하기</span></a>
+    </nav>
+    </body>
+</html>

@@ -50,6 +50,13 @@
         { id: "ramp", label: "경사로", key: "ramp" },
         { id: "braille", label: "점자 안내", key: "braille" },
     ];
+    // 꼭 필요한 것 → 지도에서 보여줄 시설 종류. 수유실은 안내센터 2곳(대여소)에도 있어 둘을 같이 연다
+    const MUST_MAP = {
+        wheelchair: ["rental"],
+        stroller: ["rental"],
+        restroom: ["toilet"],
+        nursing: ["nursing", "rental"],
+    };
     const DEFAULT_MUST = {
         wheelchair: ["wheelchair", "restroom", "parking"],
         stroller: ["stroller", "restroom", "nursing"],
@@ -82,6 +89,10 @@
         filters: new Set(DEFAULT_FILTERS.wheelchair),
         place: null,
         view: "summary",
+        // «○시 도착으로 바꾸기»를 누른 직후의 되돌리기 정보 — 사용자가 조건을 직접 바꾸면 지운다
+        applied: null,
+        // 요약 화면의 «필요한 곳»에서 지도로 왔을 때 무엇을 보러 왔는지
+        from: null,
     };
     let stats;
     let access;
@@ -167,12 +178,12 @@
         const below = rows.filter((s) => s.median < pick.median).length;
         const share = below / (rows.length - 1);
         if (share >= 2 / 3) {
-            return "많은 편이었어요";
+            return "많은 편";
         }
         if (share <= 1 / 3) {
-            return "적은 편이었어요";
+            return "적은 편";
         }
-        return "보통 수준이었어요";
+        return "보통 수준";
     };
 
     const nearbyBetter = (rows, pick) => {
@@ -188,19 +199,6 @@
     const shiftWord = (from, to) => {
         const d = to - from;
         return d > 0 ? `${d}시간 늦게` : `${-d}시간 일찍`;
-    };
-
-    const buildAnswer = (when, season, rows, pick) => {
-        const better = nearbyBetter(rows, pick);
-        const base = `작년 ${season} ${when.dayType} 기준이에요.`;
-        const hint = better
-            ? `<strong class="hero__alt">${shiftWord(pick.hour, better.hour)}(${hourWord(better.hour)})</strong> 오면 차가 약 ${Math.round((1 - better.median / pick.median) * 100)}% 적었어요.${better.hour >= 18 ? " (대여 운영시간은 전화로 확인)" : ""}`
-            : `앞뒤 ${NEAR_WINDOW}시간 중에는 이때가 한산한 편이에요.`;
-        return {
-            title: `${hourWord(when.hour)}는<br><strong>하루 중 차량이 ${dayPosition(rows, pick)}</strong>`,
-            sub: `${base}<br>${hint}`,
-            better,
-        };
     };
 
     const chartSvg = (rows, pick, threshold) => {
@@ -290,6 +288,48 @@
         return found.sort((a, b) => a.avg - b.avg).slice(0, STAY_SHOWN_OTHERS);
     };
 
+    // 카드의 «언제» 줄 — 대안은 아래 «머무는 동안의 차량»과 같은 창 비교 하나로 말한다.
+    //   시각 하나(«1시간 일찍 12%»)와 창 평균(«10%»)이 서로 다른 수를 말하던 것을 맞춘다(codex 리뷰 3)
+    const stayBest = (rows, when) => {
+        const chosen = windowAvg(rows, when.hour, when.stayUsed);
+        if (!chosen) {
+            return null;
+        }
+        const shown = [chosen, ...stayCandidates(rows, when)];
+        const lowest = shown.reduce((a, b) => (b.avg < a.avg ? b : a));
+        return { chosen, lowest, shown, gain: Math.round((1 - lowest.avg / chosen.avg) * 100) };
+    };
+
+    const planTime = (when, rows, pick) => {
+        const head = `<p class="plan__label">${icon("calendar")}언제</p>
+            <p class="plan__text">${hourWord(when.hour)} 도착은 차량이 <strong>${dayPosition(rows, pick)}</strong>이었어요</p>`;
+        const len = when.stayUsed;
+        const best = stayBest(rows, when);
+        let sub;
+        let applyHour = null;
+        if (best && best.lowest !== best.chosen && best.gain >= STAY_BETTER_BY * 100) {
+            applyHour = best.lowest.start;
+            // 몇 시간씩 떨어진 대안에 «5시간 일찍»을 붙이면 어색해서, 가까울 때만 얼마나 당기는지 말한다
+            const near = Math.abs(applyHour - when.hour) <= NEAR_WINDOW ? `${shiftWord(when.hour, applyHour)} 와서 ` : "";
+            sub = `${near}${rangeWord(applyHour, applyHour + len)}에 머물면 차가 약 ${best.gain}% 적었어요`;
+        } else if (best && best.lowest === best.chosen) {
+            sub = `같은 ${len}시간 중 ${rangeWord(when.hour, when.hour + len)}가 가장 한산했어요 · 평균 ${fmt(best.chosen.avg)}대`;
+        } else if (best) {
+            sub = `다른 시간에 머물러도 차이가 크지 않았어요 · 평균 ${fmt(best.chosen.avg)}대`;
+        } else {
+            const better = nearbyBetter(rows, pick);
+            if (better) {
+                applyHour = better.hour;
+                sub = `${shiftWord(when.hour, better.hour)}(${hourWord(better.hour)}) 오면 차가 약 ${Math.round((1 - better.median / pick.median) * 100)}% 적었어요`;
+            } else {
+                sub = `앞뒤 ${NEAR_WINDOW}시간 중에는 이때가 한산한 편이에요`;
+            }
+        }
+        const actions = applyHour === null ? ""
+            : `<div class="plan__actions"><button class="btn btn--primary" type="button" data-apply-hour="${applyHour}">${hourWord(applyHour)} 도착으로 바꾸기</button>${best ? "<button class=\"btn btn--ghost\" type=\"button\" data-scroll=\"stay\">시간대별 비교</button>" : ""}</div>`;
+        return `${head}<p class="plan__sub">${sub}</p>${actions}`;
+    };
+
     const stayRowHtml = (win, len, flags, top) => {
         const classes = ["window", flags.pick ? "window--pick" : "", flags.best ? "window--best" : ""].filter(Boolean).join(" ");
         const mark = flags.pick ? "<span class=\"window__sr\"> (고른 시간)</span>" : "";
@@ -302,14 +342,14 @@
     const renderStay = (when, season, rows) => {
         const box = $("stay");
         const len = when.stayUsed;
-        const chosen = windowAvg(rows, when.hour, len);
-        if (!chosen) {
+        const best = stayBest(rows, when);
+        if (!best) {
             box.hidden = true;
             box.innerHTML = "";
             return;
         }
-        const shown = [chosen, ...stayCandidates(rows, when)].sort((a, b) => a.start - b.start);
-        const lowest = shown.reduce((a, b) => (b.avg < a.avg ? b : a));
+        const { chosen, lowest } = best;
+        const shown = [...best.shown].sort((a, b) => a.start - b.start);
         const top = Math.max(...shown.map((w) => w.avg));
         const lowestRange = rangeWord(lowest.start, lowest.start + len);
         const gain = Math.round((1 - lowest.avg / chosen.avg) * 100);
@@ -330,36 +370,6 @@
             <p class="comparison">${comparison}</p>
             <p class="source-line">과거 같은 조건의 시간대별 중앙값을 평균한 값이에요. 방문일 예측이 아니고, 대여 운영시간·해 지는 시간은 반영하지 않았어요.</p>`;
         box.hidden = false;
-    };
-
-    const rentalCopy = () => {
-        const wheel = state.who.has("wheelchair") || state.who.has("senior");
-        const stroller = state.who.has("stroller");
-        if (wheel && stroller) {
-            return { title: "휠체어·유모차 대여는 전화로 확인해 주세요",
-                text: "대여 장소는 2곳이에요.<br>유모차는 안내 자료마다 수량이 달라요(관광공사 자료 4대+3대, 관광공사 누리집 4대). 수량은 아래 전화 버튼으로 물어볼 수 있어요." };
-        }
-        if (stroller) {
-            return { title: "유모차 대여는 전화로 확인해 주세요",
-                text: "대여 장소는 2곳이에요.<br>안내 자료마다 수량이 달라요(관광공사 자료 4대+3대, 관광공사 누리집 4대). 수량은 아래 전화 버튼으로 물어볼 수 있어요." };
-        }
-        if (wheel) {
-            return { title: "휠체어 대여는 전화로 확인해 주세요",
-                text: "대여 장소는 2곳이에요.<br>당일 빌릴 수 있는지는 미리 확인이 필요해요. 아래 전화 버튼으로 물어볼 수 있어요." };
-        }
-        return null;
-    };
-
-    const renderRental = () => {
-        const copy = rentalCopy();
-        const box = $("rental-call");
-        box.hidden = !copy;
-        if (!copy) {
-            box.innerHTML = "";
-            return;
-        }
-        box.innerHTML = `<div class="rental-call__head">${icon("bag")}<div><h2 id="rental-title">${copy.title}</h2><p>${copy.text}</p></div></div>`;
-        box.setAttribute("aria-labelledby", "rental-title");
     };
 
     const toiletPinCount = () => parkMap.pins.filter((p) => p.kind === "toilet").length;
@@ -397,11 +407,12 @@
         } else if (item.status === "differs") {
             ask("정확한 내용은 → 전화로 확인", `${def.label} 정확한 내용`);
         }
-        return { name: def.label, badge, detail, todos, questions, link: Boolean(def.link) };
+        return { id: def.id, name: def.label, badge, detail, todos, questions, link: Boolean(def.link) };
     };
 
     const mustRowHtml = (row) => {
-        const link = row.link ? `<a class="must__link" href="#map">지도에서 위치 보기${icon("right")}</a>` : "";
+        const link = row.link && MUST_MAP[row.id]
+            ? `<button class="must__link" type="button" data-go-kind="${MUST_MAP[row.id].join(" ")}" data-go-from="${esc(row.name)}">지도에서 위치 보기${icon("right")}</button>` : "";
         const todos = row.todos.map((t) => `<span class="must__todo">${icon("phone")}${esc(t)}</span>`).join("");
         return `<li class="must"><span class="must__name">${esc(row.name)}</span>
             <span class="must__state must__state--${row.badge[0]}">${esc(row.badge[1])}</span>
@@ -427,6 +438,7 @@
         const box = $("call-summary");
         box.hidden = questions.length === 0;
         box.innerHTML = questions.length ? callSummaryHtml(questions) : "";
+        return questions;
     };
 
     const renderMustPicks = () => {
@@ -437,11 +449,61 @@
         state.must = new Set(WHO_ORDER.filter((w) => state.who.has(w)).flatMap((w) => DEFAULT_MUST[w]));
     };
 
-    const setHero = (title, sub, small) => {
-        const el = $("hero-title");
-        el.innerHTML = title;
-        el.classList.toggle("hero__title--small", Boolean(small));
-        $("hero-sub").innerHTML = sub;
+    const planHead = (when) => {
+        const labels = whoLabels();
+        $("plan-who").textContent = labels.length ? `이번 방문 · ${labels.join(" · ")}` : "이번 방문";
+        if (!when) {
+            $("plan-title").textContent = "날짜를 골라 주세요";
+            return;
+        }
+        const holiday = when.holidayName ? ` ${esc(when.holidayName)}` : "";
+        $("plan-title").innerHTML = `${when.month}월 ${when.dayNum}일(${when.weekday}${holiday}) ${hourWord(when.hour)} 도착,<br>${when.stayUsed}시간 머물러요`;
+    };
+
+    const rentalWhat = () => ["wheelchair", "stroller"].filter((id) => state.must.has(id))
+        .map((id) => MUST_ITEMS.find((d) => d.id === id).rental).join("·");
+
+    // «필요한 곳» — 꼭 필요한 것으로 고른 항목 중 지도에 위치가 있는 것만, 누르면 그 시설로 바로 연다
+    const planPlaces = () => {
+        const chips = [];
+        const chip = (badge, kind, title, sub, go) => chips.push(`<button class="place-chip" type="button" data-go-kind="${go.kinds.join(" ")}" data-go-from="${esc(go.from)}"${go.place ? ` data-go-place="${esc(go.place)}"` : ""}>
+            <span class="place-chip__badge${kind === "toilet" ? " place-chip__badge--wc" : ""}" aria-hidden="true">${badge}</span>
+            <span><strong>${esc(title)}</strong><small>${esc(sub)}</small></span>${icon("right")}</button>`);
+        const what = rentalWhat();
+        if (what) {
+            parkMap.pins.filter((p) => p.kind === "rental").forEach((p) =>
+                chip(GLYPH.rental, "rental", p.label, `${what} 대여 · 위치 보기`, { kinds: ["rental"], from: `${what} 대여`, place: p.id }));
+        }
+        if (state.must.has("restroom")) {
+            chip(GLYPH.toilet, "toilet", `휠체어 화장실 ${toiletPinCount()}곳`, "오픈스트리트맵 등록 · 현장 확인 전", { kinds: ["toilet"], from: "장애인 화장실" });
+        }
+        if (state.must.has("nursing")) {
+            const n = parkMap.pins.filter((p) => MUST_MAP.nursing.includes(p.kind)).length;
+            chip(GLYPH.nursing, "nursing", `수유실 있는 곳 ${n}곳`, "안내센터 2곳 · 한성백제박물관", { kinds: MUST_MAP.nursing, from: "수유실" });
+        }
+        const box = $("plan-places");
+        box.hidden = chips.length === 0;
+        box.innerHTML = chips.length ? `<p class="plan__label">${icon("pin")}필요한 곳</p><div class="plan__places">${chips.join("")}</div>` : "";
+    };
+
+    const planCall = (questions) => {
+        const box = $("plan-call");
+        box.hidden = questions.length === 0;
+        box.innerHTML = questions.length ? `<p class="plan__text">출발 전 전화로 물어볼 것 <span class="plan__count">${questions.length}가지</span></p>
+            <p class="plan__sub">${questions.map(esc).join(" · ")}</p>
+            <div class="plan__actions"><button class="btn" type="button" data-scroll="call-summary">${icon("phone")}물어볼 것 보기</button></div>` : "";
+    };
+
+    const renderApplied = () => {
+        const box = $("applied");
+        box.hidden = !state.applied;
+        box.innerHTML = state.applied
+            ? `<span>${hourWord(state.applied.to)} 도착으로 바꿨어요</span><button id="applied-undo" type="button">되돌리기</button>` : "";
+    };
+
+    const planMessage = (text) => {
+        $("plan-time").classList.remove("is-new");
+        $("plan-time").innerHTML = `<p class="plan__label">${icon("calendar")}언제</p><p class="plan__sub">${text}</p>`;
     };
 
     const dayKindText = (when) => {
@@ -479,28 +541,32 @@
     const renderSummary = () => {
         const when = readWhen();
         renderCondition(when);
-        renderRental();
-        renderMust();
+        const questions = renderMust();
         renderSources(when);
+        planHead(when);
+        planPlaces();
+        planCall(questions);
+        renderApplied();
         if (!when) {
-            setHero("날짜를 선택해 주세요", "", true);
+            planMessage("날짜를 고르면 작년 같은 조건의 기록과 비교해 드려요.");
             $("flow").hidden = true;
             $("stay").hidden = true;
             return;
         }
         const season = SEASONS[when.month];
+        $("plan-basis").textContent = `작년 ${season} ${when.dayType} 기록과 비교했어요.`;
         const rows = dayRows(season, when.dayType);
         const pick = rows.find((s) => s.hour === when.hour);
         const days = pick ? pick.n : 0;
         if (!pick || days < MIN_DAYS) {
-            setHero(`이 조건은 작년 기록이 ${days}일뿐이라<br>비교하지 않았어요`,
-                `작년 ${season} ${when.dayType} 기준이에요. 아래 시설 안내와 지도는 그대로 볼 수 있어요.`, true);
+            planMessage(`이 조건은 작년 기록이 ${days}일뿐이라 비교하지 않았어요. 아래 시설 안내와 지도는 그대로 볼 수 있어요.`);
             $("flow").hidden = true;
             $("stay").hidden = true;
             return;
         }
-        const answer = buildAnswer(when, season, rows, pick);
-        setHero(answer.title, answer.sub, false);
+        const timeRow = $("plan-time");
+        timeRow.innerHTML = planTime(when, rows, pick);
+        timeRow.classList.toggle("is-new", Boolean(state.applied && state.applied.to === when.hour));
         $("flow").hidden = false;
         renderFlow(when, season, rows, pick);
         renderStay(when, season, rows);
@@ -580,6 +646,32 @@
         $("map-thumb").innerHTML = mapSvg(false);
     };
 
+    const renderFrom = () => {
+        const box = $("from-must");
+        if (!state.from) {
+            box.hidden = true;
+            box.innerHTML = "";
+            return;
+        }
+        const labels = FILTERS.filter((f) => state.filters.has(f.kind)).map((f) => f.label).join("·");
+        box.hidden = false;
+        box.innerHTML = `<strong>${esc(state.from)}</strong>에서 왔어요 · ${esc(labels)} ${visiblePins().length}곳만 보여드려요 · <button id="from-reset" type="button">모든 시설 보기</button>`;
+    };
+
+    // 시트 안 «여기에 물어볼 것» — 고른 «꼭 필요한 것»과 이 장소가 겹칠 때만
+    const askHere = (pin) => {
+        let q = null;
+        const what = rentalWhat();
+        if (pin.kind === "rental" && what) {
+            q = `오늘 ${what}를 빌릴 수 있나요?`;
+        } else if (pin.kind === "toilet" && state.must.has("restroom")) {
+            q = "이 화장실을 휠체어로 쓸 수 있나요?";
+        } else if (pin.kind === "nursing" && state.must.has("nursing")) {
+            q = "수유실을 지금 쓸 수 있나요?";
+        }
+        return q ? `<div class="ask-here"><strong>여기에 물어볼 것</strong>«${esc(q)}» · ${PARK_PHONE}</div>` : "";
+    };
+
     const renderFilters = () => {
         $("map-filters").innerHTML = FILTERS.map((f) =>
             `<button class="filter" type="button" data-kind="${f.kind}" aria-pressed="${state.filters.has(f.kind)}">
@@ -606,6 +698,7 @@
             <p class="place-category">선택한 장소 · ${esc(KIND_LABEL[pin.kind])}</p>
             <h2 id="place-name" tabindex="-1">${esc(pinName(pin))}</h2>
             ${pin.detail ? `<p class="place-sub">${esc(pin.detail)}</p>` : ""}
+            ${askHere(pin)}
             ${rows}
             <div class="place-actions"><a href="tel:024101114">${icon("phone")}전화하기</a>${naver}</div>
             <p class="route-note">길찾기는 네이버 지도에서 확인해 주세요.<br>휠체어로 이동 가능한 경로인지는 별도 확인이 필요해요.</p>`;
@@ -628,6 +721,7 @@
 
     const renderMap = () => {
         ensurePlace();
+        renderFrom();
         renderFilters();
         $("big-map").innerHTML = mapSvg(true);
         renderPanel();
@@ -696,12 +790,44 @@
         }
     };
 
+    const goToMap = (kinds, place, from) => {
+        state.filters = new Set(kinds);
+        state.place = place || null;
+        state.from = from;
+        if (location.hash === "#map") {
+            showView("map", true);
+        } else {
+            location.hash = "#map";
+        }
+    };
+
+    const applyHour = (hour) => {
+        const select = $("visit-hour");
+        const prev = Number(select.value);
+        select.value = String(hour);
+        state.applied = { from: prev, to: hour };
+        renderSummary();
+        $("applied-undo")?.focus();
+    };
+
+    const undoApplied = () => {
+        if (!state.applied) {
+            return;
+        }
+        $("visit-hour").value = String(state.applied.from);
+        state.applied = null;
+        renderSummary();
+        $("plan-title").setAttribute("tabindex", "-1");
+        $("plan-title").focus();
+    };
+
     /* 화면 전환 */
     const viewFromHash = () => (location.hash === "#map" ? "map" : "summary");
 
     const showView = (name, scrollTop) => {
         requestAnimationFrame(() => state.refreshScrollEdges?.());
         state.view = name;
+        document.body.dataset.view = name;
         $("view-summary").hidden = name !== "summary";
         $("view-map").hidden = name !== "map";
         const setCurrent = (el, on) => (on ? el.setAttribute("aria-current", "page") : el.removeAttribute("aria-current"));
@@ -805,6 +931,7 @@
             btn.setAttribute("aria-pressed", String(state.who.has(btn.dataset.who)));
             resetMustToWho();
             syncFiltersToWho();
+            state.applied = null;
             renderSummary();
             renderMap();
         }));
@@ -812,10 +939,39 @@
             const btn = e.target.closest(".must-pick");
             if (btn) {
                 toggleSet(state.must, btn.dataset.must);
-                renderMust();
+                renderSummary();
             }
         });
-        ["visit-date", "visit-hour", "visit-stay"].forEach((id) => $(id).addEventListener("change", renderSummary));
+        ["visit-date", "visit-hour", "visit-stay"].forEach((id) => $(id).addEventListener("change", () => {
+            state.applied = null;
+            renderSummary();
+        }));
+        $("view-summary").addEventListener("click", (e) => {
+            const apply = e.target.closest("[data-apply-hour]");
+            if (apply) {
+                applyHour(Number(apply.dataset.applyHour));
+                return;
+            }
+            if (e.target.closest("#applied-undo")) {
+                undoApplied();
+                return;
+            }
+            const go = e.target.closest("[data-go-kind]");
+            if (go) {
+                goToMap(go.dataset.goKind.split(" "), go.dataset.goPlace, go.dataset.goFrom);
+                return;
+            }
+            const jump = e.target.closest("[data-scroll]");
+            if (jump) {
+                $(jump.dataset.scroll).scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
+        $("plan-edit").addEventListener("click", () => {
+            const cond = document.querySelector(".condition");
+            cond.open = true;
+            cond.scrollIntoView({ block: "start" });
+            cond.querySelector("summary").focus({ preventScroll: true });
+        });
         $("visit-date").addEventListener("click", () => {
             try {
                 $("visit-date").showPicker?.();
@@ -827,6 +983,7 @@
             const btn = e.target.closest(".filter");
             if (btn) {
                 toggleSet(state.filters, btn.dataset.kind);
+                state.from = null;
                 renderMap();
             }
         });
@@ -836,7 +993,15 @@
                 selectPlace(target.dataset.place, true);
             }
         };
-        $("view-map").addEventListener("click", pickPlace);
+        $("view-map").addEventListener("click", (e) => {
+            if (e.target.closest("#from-reset")) {
+                state.from = null;
+                syncFiltersToWho();
+                renderMap();
+                return;
+            }
+            pickPlace(e);
+        });
         $("big-map").addEventListener("keydown", (e) => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -907,6 +1072,7 @@
 
     init().catch((err) => {
         console.error("[init] 데이터 불러오기 실패", err);
-        setHero("데이터를 불러오지 못했어요", "잠시 뒤 다시 열어 주세요.", true);
+        $("plan-title").textContent = "데이터를 불러오지 못했어요";
+        planMessage("잠시 뒤 다시 열어 주세요.");
     });
 })();
