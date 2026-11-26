@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>모두의 올팍 · 추가 기능 목업</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .mock-label {
+            margin: 18px 20px 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #1e2a24;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .stay-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .window-list {
+            display: grid;
+            gap: 10px;
+            margin: 16px 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .window {
+            display: grid;
+            grid-template-columns: 92px 1fr 62px;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .window__bar {
+            height: 12px;
+            border-radius: 6px;
+            background: #dfe8e2;
+            overflow: hidden;
+        }
+
+        .window__fill {
+            display: block;
+            height: 100%;
+            border-radius: 6px;
+            background: #9ab9a6;
+        }
+
+        .window--pick {
+            font-weight: 700;
+        }
+
+        .window--pick .window__fill {
+            background: var(--green);
+        }
+
+        .window--best .window__label::after {
+            content: " 가장 적음";
+            color: var(--green);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .window__num {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .must-picks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .must-list {
+            display: grid;
+            gap: 0;
+            margin: 16px 0 0;
+            padding: 0;
+            list-style: none;
+            border-top: 1px solid var(--line);
+        }
+
+        .must {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 4px 10px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .must__name {
+            font-weight: 700;
+        }
+
+        .must__state {
+            align-self: start;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .must__state--ok {
+            background: var(--green-soft);
+            color: var(--green);
+        }
+
+        .must__state--diff {
+            background: var(--orange-soft);
+            color: var(--orange);
+        }
+
+        .must__state--none {
+            background: #eceff1;
+            color: #4a545b;
+        }
+
+        .must__detail {
+            grid-column: 1 / -1;
+            color: var(--secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .must__todo {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .call-summary {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--canvas);
+            font-size: 14px;
+        }
+
+        .call-summary ol {
+            margin: 6px 0 0;
+            padding-left: 18px;
+        }
+    </style>
+</head>
+<body>
+<main class="app">
+    <header class="top">
+        <span class="brand"><img class="logo" src="../assets/logo.svg" alt="" width="32" height="32"><span>모두의 올팍</span></span>
+        <span class="park-name">올림픽공원</span>
+    </header>
+
+    <div class="mock-label">② 머무는 시간 — 조건 칸에 «머무는 시간» 하나 추가</div>
+    <section class="block">
+        <div class="stay-row">
+            <label class="field"><span>도착 시각</span><span class="field__input date-field__shown">오후 2시</span></label>
+            <label class="field"><span>머무는 시간</span><span class="field__input date-field__shown">3시간</span></label>
+        </div>
+    </section>
+
+    <div class="mock-label">② 머무는 시간 — 요약에 새 칸</div>
+    <section class="block flow">
+        <div class="section-head"><h2>머무는 동안의 차량</h2></div>
+        <p class="hero__sub" style="margin-top:6px">오후 2시~5시 머무는 동안 평균 <strong>2,238대</strong> · 작년 가을 주말·휴일 15일 기준</p>
+        <ul class="window-list" aria-label="같은 3시간을 다른 시각에 머물렀을 때 평균 주차대수">
+            <li class="window window--best"><span class="window__label">오전 10시~1시</span><span class="window__bar"><span class="window__fill" style="width:70%"></span></span><span class="window__num">1,557대</span></li>
+            <li class="window"><span class="window__label">낮 12시~3시</span><span class="window__bar"><span class="window__fill" style="width:90%"></span></span><span class="window__num">2,004대</span></li>
+            <li class="window window--pick"><span class="window__label">오후 2시~5시</span><span class="window__bar"><span class="window__fill" style="width:100%"></span></span><span class="window__num">2,238대</span></li>
+            <li class="window"><span class="window__label">오후 4시~7시</span><span class="window__bar"><span class="window__fill" style="width:77%"></span></span><span class="window__num">1,734대</span></li>
+        </ul>
+        <p class="comparison"><strong>오전 10시~1시</strong>에 머물면 차가 약 30% 적었어요</p>
+        <p class="source-line">과거 같은 조건의 시간대별 중앙값 평균이에요. 방문일 예측이 아니고, 대여 운영시간·해 지는 시간은 반영하지 않았어요.</p>
+    </section>
+
+    <div class="mock-label">① 필수 조건 확인표 — «방문 전에 확인해 주세요»를 바꾼 모습</div>
+    <section class="block prep">
+        <h2>꼭 필요한 것</h2>
+        <p class="hero__sub" style="margin-top:6px">없으면 곤란한 것만 골라 주세요. 확인된 것과 아직 모르는 것을 나눠 보여드려요.</p>
+        <div class="must-picks">
+            <button class="pick" type="button" aria-pressed="true"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>휠체어 대여</span></button>
+            <button class="pick" type="button" aria-pressed="true"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>장애인 화장실</span></button>
+            <button class="pick" type="button" aria-pressed="true"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>장애인 주차</span></button>
+            <button class="pick" type="button" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>수유실</span></button>
+            <button class="pick" type="button" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>턱 없는 출입구</span></button>
+        </div>
+        <ul class="must-list">
+            <li class="must">
+                <span class="must__name">휠체어 대여</span><span class="must__state must__state--ok">장소 확인됨</span>
+                <span class="must__detail">평화의광장 앞 공원안내센터 · 동1문 안내센터</span>
+                <span class="must__todo">☎ 당일 빌릴 수 있는지는 공개되지 않아요 → 전화로 확인</span>
+            </li>
+            <li class="must">
+                <span class="must__name">장애인 화장실</span><span class="must__state must__state--none">위치 공식 자료 없음</span>
+                <span class="must__detail">관광공사 자료엔 «있음»만, 위치는 오픈스트리트맵 등록 4곳(현장 확인 전)</span>
+                <span class="must__todo">☎ 도착할 곳 근처에 있는지 전화로 확인</span>
+            </li>
+            <li class="must">
+                <span class="must__name">장애인 주차</span><span class="must__state must__state--diff">출처마다 다름</span>
+                <span class="must__detail">관광공사 API «장애인 주차장 140칸» · 공식 웹 «주차 개수 140»</span>
+                <span class="must__todo">☎ 140칸이 장애인 전용인지 전화로 확인</span>
+            </li>
+        </ul>
+        <div class="call-summary">
+            <strong>전화 한 번에 물어볼 것 3가지</strong> · 공원 안내 02-410-1114
+            <ol><li>휠체어 당일 대여 가능 여부</li><li>도착 장소 근처 장애인 화장실</li><li>장애인 전용 주차면 수</li></ol>
+        </div>
+    </section>
+</main>
+</body>
+</html>

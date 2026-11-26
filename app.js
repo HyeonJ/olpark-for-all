@@ -36,11 +36,26 @@
         venue: "공연장",
     };
     const SHORT_NAME = { "info-peace": "평화의광장", "info-east1": "동1문", museum: "박물관" };
-    const FACT_ICON = {
-        parking: "parking", entrance: "door", wheelchair: "bag", stroller: "bag",
-        restroom: "pin", ramp: "ramp", nursing: "drop", braille: "braille",
+    const STAY_OPTIONS = [1, 2, 3, 4];
+    const STAY_DEFAULT = 3;
+    const STAY_SHOWN_OTHERS = 3;
+    const STAY_BETTER_BY = 0.1;
+    const MUST_ITEMS = [
+        { id: "wheelchair", label: "휠체어 대여", key: "wheelchair", rental: "휠체어", link: true },
+        { id: "stroller", label: "유모차 대여", key: "stroller", rental: "유모차", link: true },
+        { id: "restroom", label: "장애인 화장실", key: "restroom", link: true },
+        { id: "parking", label: "장애인 주차", key: "parking" },
+        { id: "nursing", label: "수유실", key: "nursing", link: true },
+        { id: "entrance", label: "턱 없는 출입구", key: "entrance" },
+        { id: "ramp", label: "경사로", key: "ramp" },
+        { id: "braille", label: "점자 안내", key: "braille" },
+    ];
+    const DEFAULT_MUST = {
+        wheelchair: ["wheelchair", "restroom", "parking"],
+        stroller: ["stroller", "restroom", "nursing"],
+        senior: ["wheelchair", "restroom"],
+        visual: ["braille"],
     };
-    const MISMATCH_LABEL = { parking: "주차", stroller: "유모차", nursing: "수유실", braille: "점자 안내" };
     const PLACE_INFO = {
         "info-peace": { rows: [
             ["휠체어 대여는 전화로 확인해 주세요", "수량과 당일 대여 가능 여부는 공개되지 않았어요."],
@@ -61,7 +76,13 @@
     const TOILET_INFO = { rows: [["현장 확인 전 자료예요", "오픈스트리트맵에 ‘휠체어 이용 가능’으로 등록된 곳이에요. 정확한 이용 가능 여부는 현장에서 확인해 주세요."]] };
 
     const $ = (id) => document.getElementById(id);
-    const state = { who: new Set(["wheelchair"]), filters: new Set(DEFAULT_FILTERS.wheelchair), place: null, view: "summary" };
+    const state = {
+        who: new Set(["wheelchair"]),
+        must: new Set(DEFAULT_MUST.wheelchair),
+        filters: new Set(DEFAULT_FILTERS.wheelchair),
+        place: null,
+        view: "summary",
+    };
     let stats;
     let access;
     let parkMap;
@@ -77,6 +98,21 @@
             return "낮 12시";
         }
         return h < 12 ? `오전 ${h}시` : `오후 ${h - 12}시`;
+    };
+
+    const periodOf = (h) => {
+        if (h === 12) {
+            return "낮";
+        }
+        return h < 12 ? "오전" : "오후";
+    };
+
+    const clock12 = (h) => (h > 12 ? h - 12 : h);
+
+    // 시작에는 오전/오후를 늘 붙이고, 끝은 시작과 다를 때만 붙인다 — «오전 10시~오후 1시», «오후 2시~5시»
+    const rangeWord = (start, end) => {
+        const endText = periodOf(end) === periodOf(start) ? `${clock12(end)}시` : `${periodOf(end)} ${clock12(end)}시`;
+        return `${periodOf(start)} ${clock12(start)}시~${endText}`;
     };
 
     const whoLabels = () => WHO_ORDER.filter((w) => state.who.has(w)).map((w) => WHO_LABEL[w]);
@@ -98,6 +134,8 @@
         }
         const day = new Date(`${dateText}T12:00:00+09:00`).getUTCDay();
         const year = dateText.slice(0, 4);
+        const hour = Number($("visit-hour").value);
+        const stay = Number($("visit-stay").value);
         const holidayName = holidays.map.get(dateText) || null;
         return {
             dateText,
@@ -108,7 +146,9 @@
             holidayName,
             holidayKnown: holidays.years.includes(year),
             dayType: day === 0 || day === 6 || holidayName ? "주말·휴일" : "평일",
-            hour: Number($("visit-hour").value),
+            hour,
+            stay,
+            stayUsed: Math.min(stay, OPEN.last + 1 - hour),
         };
     };
 
@@ -153,7 +193,7 @@
         const better = nearbyBetter(rows, pick);
         const base = `작년 ${season} ${when.dayType} 기준이에요.`;
         const hint = better
-            ? `<strong class="hero__alt">${shiftWord(pick.hour, better.hour)}(${hourWord(better.hour)})</strong> 오면 차가 약 ${Math.round((1 - better.median / pick.median) * 100)}% 적었어요.`
+            ? `<strong class="hero__alt">${shiftWord(pick.hour, better.hour)}(${hourWord(better.hour)})</strong> 오면 차가 약 ${Math.round((1 - better.median / pick.median) * 100)}% 적었어요.${better.hour >= 18 ? " (대여 운영시간은 전화로 확인)" : ""}`
             : `앞뒤 ${NEAR_WINDOW}시간 중에는 이때가 한산한 편이에요.`;
         return {
             title: `${hourWord(when.hour)}는<br><strong>하루 중 차가 ${dayPosition(rows, pick)}</strong>`,
@@ -222,6 +262,68 @@
             </div></details>`;
     };
 
+    // 같은 길이로 머무는 창의 평균 — 창 안 시간대가 하나라도 비었거나 표본이 모자라면 세지 않는다
+    const windowAvg = (rows, start, len) => {
+        const parts = rows.filter((s) => s.hour >= start && s.hour < start + len);
+        if (parts.length !== len || parts.some((s) => s.n < MIN_DAYS)) {
+            return null;
+        }
+        return {
+            start,
+            avg: Math.round(parts.reduce((sum, s) => sum + s.median, 0) / len),
+            days: Math.min(...parts.map((s) => s.n)),
+        };
+    };
+
+    const stayCandidates = (rows, when) => {
+        const found = [];
+        for (let start = SUGGEST.first; start <= SUGGEST.last; start += 1) {
+            // 후보는 머무는 마지막 시간대가 19시를 넘지 않는 창만 — 해 진 뒤·마감 직전 창을 «한산하다»고 권하면 쓸모가 없다
+            const win = start === when.hour || start + when.stayUsed - 1 > SUGGEST.last
+                ? null : windowAvg(rows, start, when.stayUsed);
+            if (win) {
+                found.push(win);
+            }
+        }
+        return found.sort((a, b) => a.avg - b.avg).slice(0, STAY_SHOWN_OTHERS);
+    };
+
+    const stayRowHtml = (win, len, flags, top) => {
+        const classes = ["window", flags.pick ? "window--pick" : "", flags.best ? "window--best" : ""].filter(Boolean).join(" ");
+        const mark = flags.pick ? "<span class=\"window__sr\"> (고른 시간)</span>" : "";
+        const tag = flags.best ? "<small class=\"window__tag\">가장 적음</small>" : "";
+        return `<li class="${classes}"><span class="window__label">${rangeWord(win.start, win.start + len)}${mark}${tag}</span>
+            <span class="window__bar" aria-hidden="true"><span class="window__fill" style="width:${((win.avg / top) * 100).toFixed(1)}%"></span></span>
+            <span class="window__num">${fmt(win.avg)}대</span></li>`;
+    };
+
+    const renderStay = (when, season, rows) => {
+        const box = $("stay");
+        const len = when.stayUsed;
+        const chosen = windowAvg(rows, when.hour, len);
+        if (!chosen) {
+            box.hidden = true;
+            box.innerHTML = "";
+            return;
+        }
+        const shown = [chosen, ...stayCandidates(rows, when)].sort((a, b) => a.start - b.start);
+        const lowest = shown.reduce((a, b) => (b.avg < a.avg ? b : a));
+        const top = Math.max(...shown.map((w) => w.avg));
+        const better = lowest !== chosen && lowest.avg <= chosen.avg * (1 - STAY_BETTER_BY);
+        const comparison = better
+            ? `<strong>${rangeWord(lowest.start, lowest.start + len)}</strong>에 머물면 차가 약 ${Math.round((1 - lowest.avg / chosen.avg) * 100)}% 적었어요`
+            : "같은 길이로 머문다면 이때가 한산한 편이에요";
+        const capped = when.stay > len
+            ? `<p class="stay__note">공원 차량 출입은 ${OPEN.last + 1}시까지라 ${hourWord(OPEN.last + 1)}까지만 셌어요</p>` : "";
+        const items = shown.map((w) => stayRowHtml(w, len, { pick: w === chosen, best: w === lowest }, top)).join("");
+        box.innerHTML = `<div class="section-head"><h2 id="stay-title">머무는 동안의 차량</h2></div>
+            <p class="stay__lead">${rangeWord(when.hour, when.hour + len)} 머무는 동안 평균 <strong>${fmt(chosen.avg)}대</strong> · 작년 ${esc(season)} ${esc(when.dayType)} ${chosen.days}일 기준</p>${capped}
+            <ul class="window-list" aria-label="같은 ${len}시간을 다른 시각에 머물렀을 때 평균 주차대수">${items}</ul>
+            <p class="comparison">${comparison}</p>
+            <p class="source-line">과거 같은 조건의 시간대별 중앙값을 평균한 값이에요. 방문일 예측이 아니고, 대여 운영시간·해 지는 시간은 반영하지 않았어요.</p>`;
+        box.hidden = false;
+    };
+
     const rentalCopy = () => {
         const wheel = state.who.has("wheelchair") || state.who.has("senior");
         const stroller = state.who.has("stroller");
@@ -254,55 +356,80 @@
         box.setAttribute("aria-labelledby", "rental-title");
     };
 
-    const MAP_LINK_KEYS = new Set(["wheelchair", "stroller", "nursing", "restroom"]);
+    const toiletPinCount = () => parkMap.pins.filter((p) => p.kind === "toilet").length;
 
-    const factText = (it) => {
-        if (it.key === "restroom") {
-            return { title: "휠체어 이용 가능으로 등록된 화장실",
-                text: "오픈스트리트맵 기준이고 현장 확인 전이에요.<br>공식 자료에는 정확한 위치가 없어요." };
+    // «이용 가능» 같은 판단어는 쓰지 않는다 — 자료에 적힌 것과 비어 있는 것만 나눠 보여준다
+    const mustRow = (def) => {
+        const item = access.items.find((it) => it.key === def.key);
+        if (!item) {
+            return { name: def.label, badge: ["none", "공개 자료 없음"], detail: "관광공사 자료에서 찾지 못했어요.", todos: [], questions: [] };
         }
-        const note = it.note ? `<br>${esc(it.note)}` : "";
-        return { title: esc(it.label), text: `${esc(it.api)}${note}` };
+        const questions = [];
+        const todos = [];
+        const ask = (line, question) => {
+            todos.push(line);
+            questions.push(question);
+        };
+        let badge;
+        let detail;
+        if (def.id === "restroom") {
+            badge = ["none", "위치 공식 자료 없음"];
+            detail = `관광공사 자료엔 «있음»만 있고, 위치는 오픈스트리트맵 등록 ${toiletPinCount()}곳(현장 확인 전)`;
+            ask("도착할 곳 근처에 있는지 → 전화로 확인", "도착할 곳 근처 장애인 화장실");
+        } else if (item.status === "differs") {
+            badge = ["diff", "출처마다 다름"];
+            detail = `관광공사 API «${item.api}» · 공식 웹 «${item.web}»`;
+        } else {
+            badge = ["ok", "확인됨"];
+            detail = item.api;
+        }
+        // 항목마다 따로 정한 확인거리가 있으면 그것으로 말하고, 없는 «출처마다 다름»만 일반 문구를 쓴다
+        if (def.rental) {
+            ask("당일 빌릴 수 있는지는 공개되지 않아요 → 전화로 확인", `${def.rental} 당일 대여 가능 여부`);
+        } else if (def.id === "parking") {
+            ask("140칸이 장애인 전용인지 → 전화로 확인", "장애인 전용 주차면 수");
+        } else if (item.status === "differs") {
+            ask("정확한 내용은 → 전화로 확인", `${def.label} 정확한 내용`);
+        }
+        return { name: def.label, badge, detail, todos, questions, link: Boolean(def.link) };
     };
 
-    const mismatchTitle = (items) => {
-        const names = items.map((it) => MISMATCH_LABEL[it.key] || it.label);
-        const onlyCount = items.every((it) => it.key === "parking" || it.key === "stroller");
-        return `${names.join("·")} ${onlyCount ? "수량은" : "정보는"} 확인이 필요해요`;
+    const mustRowHtml = (row) => {
+        const link = row.link ? `<a class="must__link" href="#map">지도에서 위치 보기${icon("right")}</a>` : "";
+        const todos = row.todos.map((t) => `<span class="must__todo">${icon("phone")}${esc(t)}</span>`).join("");
+        return `<li class="must"><span class="must__name">${esc(row.name)}</span>
+            <span class="must__state must__state--${row.badge[0]}">${esc(row.badge[1])}</span>
+            <span class="must__detail">${esc(row.detail)}</span>${todos}${link}</li>`;
     };
 
-    const renderFacts = () => {
-        const items = access.items.filter((it) => state.who.size === 0 || it.for.some((f) => state.who.has(f)));
-        const differs = items.filter((it) => it.status === "differs");
-        // 출처끼리 표현이 다른 항목도 본문에 보인다 — 접힌 상자에만 두면 유모차·시각장애인에게 필요한
-        //   수유실·수량·점자 안내가 통째로 숨는다(Darren M:1y0h 캡처로 확인). 꼬리표로 표시하고 대조는 아래 상자에서.
-        $("facts").innerHTML = items.length ? items.map((it) => {
-            const t = factText(it);
-            const flag = it.status === "differs" ? "<span class=\"fact__flag\">출처마다 다름</span>" : "";
-            const link = MAP_LINK_KEYS.has(it.key) ? `<a class="fact__link" href="#map">지도에서 위치 보기${icon("right")}</a>` : "";
-            return `<li class="fact"><div class="fact__icon">${icon(FACT_ICON[it.key] || "info")}</div>
-                <div><h3>${t.title}${flag}</h3><p>${t.text}</p>${link}</div></li>`;
-        }).join("") : "<li class=\"empty-note\">함께 가는 분을 고르면 꼭 확인할 것을 골라 보여드려요.</li>";
-        if (state.who.has("visual")) {
-            // 시각장애인 동행엔 공개 자료가 점자 안내 하나뿐이라 «물어볼 곳»을 같이 둔다(번호는 관광공사 자료의 공원 안내)
-            $("facts").insertAdjacentHTML("beforeend", `<li class="fact"><div class="fact__icon">${icon("phone")}</div>
-                <div><h3>시설 위치는 공원 안내에 물어보세요</h3><p>공개 자료에는 점자 안내 장소 외의 시각장애인 편의 정보가 없어요.<br>공원 안내 02-410-1114</p></div></li>`);
+    const callSummaryHtml = (questions) => `<strong>전화 한 번에 물어볼 것 ${questions.length}가지</strong> <span class="nowrap">· 공원 안내 ${PARK_PHONE}</span>
+        <ol>${questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>
+        <a class="call-inline" href="tel:024101114">${icon("phone")}공원 안내 전화하기</a>`;
+
+    const renderMust = () => {
+        document.querySelectorAll(".must-pick").forEach((btn) =>
+            btn.setAttribute("aria-pressed", String(state.must.has(btn.dataset.must))));
+        const rows = MUST_ITEMS.filter((def) => state.must.has(def.id)).map(mustRow);
+        const list = $("must-list");
+        list.innerHTML = rows.length ? rows.map(mustRowHtml).join("")
+            : "<li class=\"empty-note\">꼭 필요한 것을 고르면 확인된 것과 확인할 것을 나눠 보여드려요.</li>";
+        if (state.must.has("braille")) {
+            // 점자 안내 하나만으론 시각장애인 동행에 부족해서 «물어볼 곳»을 같이 둔다(번호는 관광공사 자료의 공원 안내)
+            list.insertAdjacentHTML("beforeend", `<li class="must"><span class="must__name">시설 위치는 공원 안내에 물어보세요</span>
+                <span class="must__detail">공개 자료에는 점자 안내 장소 외의 시각장애인 편의 정보가 없어요.<br>공원 안내 ${PARK_PHONE}</span></li>`);
         }
-        const box = $("mismatch");
-        box.hidden = differs.length === 0;
-        if (!differs.length) {
-            box.innerHTML = "";
-            return;
-        }
-        const web = access.sources.find((s) => s.id === "web");
-        const api = access.sources.find((s) => s.id === "api");
-        const entries = differs.map((it) => `<p><strong>${esc(it.label)}</strong>
-            <span class="versus"><span><b>한국관광공사 API</b>${esc(it.api)}</span><span><b>공식 웹</b>${esc(it.web)}</span></span>
-            ${it.note ? `<span class="mismatch-note">${esc(it.note)}</span>` : ""}</p>`).join("");
-        box.innerHTML = `<summary class="mismatch__summary">${icon("info")}${esc(mismatchTitle(differs))}${icon("down").replace("class=\"icon\"", "class=\"icon arrow\"")}</summary>
-            <div class="detail-body">${entries}
-            <p>시설 정보 대조 ${esc(api.checkedAt)} · 웹 수정 ${esc(web.updatedAt)}</p>
-            <a class="call-inline" href="tel:024101114">${icon("phone")}공원 안내 전화 문의</a></div>`;
+        const questions = rows.flatMap((r) => r.questions);
+        const box = $("call-summary");
+        box.hidden = questions.length === 0;
+        box.innerHTML = questions.length ? callSummaryHtml(questions) : "";
+    };
+
+    const renderMustPicks = () => {
+        $("must-picks").innerHTML = MUST_ITEMS.map((def) => `<button class="pick must-pick" type="button" data-must="${def.id}" aria-pressed="${state.must.has(def.id)}"><span class="pick__face">${CHIP_SVG("<path d=\"M5 12.5l4.5 4.5L19 7\"/>").replace("<svg ", "<svg class=\"pick__check\" ")}${esc(def.label)}</span></button>`).join("");
+    };
+
+    const resetMustToWho = () => {
+        state.must = new Set(WHO_ORDER.filter((w) => state.who.has(w)).flatMap((w) => DEFAULT_MUST[w]));
     };
 
     const setHero = (title, sub, small) => {
@@ -336,10 +463,11 @@
         const who = labels.length > 1 ? `${labels[0]} 외` : labels[0] || "동행 선택 안 함";
         const holiday = when.holidayName ? ` ${esc(when.holidayName)}` : "";
         const tail = esc(who);
+        const stayText = rangeWord(when.hour, when.hour + when.stayUsed);
         // aria-label 은 일반 span 에선 낭독되지 않는다 — 누를 수 있는 summary 에 단다
         document.querySelector(".condition__summary").setAttribute("aria-label",
-            `${when.month}월 ${when.dayNum}일 ${when.weekday}요일${when.holidayName || ""}, ${hourWord(when.hour)} 도착, ${labels.length ? `함께 가는 분 ${labels.join(", ")}` : "동행 선택 안 함"}`);
-        $("condition-text").innerHTML = `<b>${when.month}.${when.dayNum} (${when.weekday})${holiday}</b>${dot}${hourWord(when.hour)} 도착${dot}${tail}`;
+            `${when.month}월 ${when.dayNum}일 ${when.weekday}요일${when.holidayName || ""}, ${hourWord(when.hour)} 도착, 머무는 시간 ${when.stayUsed}시간, ${labels.length ? `함께 가는 분 ${labels.join(", ")}` : "동행 선택 안 함"}`);
+        $("condition-text").innerHTML = `<b>${when.month}.${when.dayNum} (${when.weekday})${holiday}</b>${dot}${stayText}${dot}${tail}`;
         $("day-kind").innerHTML = dayKindText(when);
     };
 
@@ -347,11 +475,12 @@
         const when = readWhen();
         renderCondition(when);
         renderRental();
-        renderFacts();
+        renderMust();
         renderSources(when);
         if (!when) {
             setHero("날짜를 선택해 주세요", "", true);
             $("flow").hidden = true;
+            $("stay").hidden = true;
             return;
         }
         const season = SEASONS[when.month];
@@ -362,12 +491,14 @@
             setHero(`이 조건은 작년 기록이 ${days}일뿐이라<br>비교하지 않았어요`,
                 `작년 ${season} ${when.dayType} 기준이에요. 아래 시설 안내와 지도는 그대로 볼 수 있어요.`, true);
             $("flow").hidden = true;
+            $("stay").hidden = true;
             return;
         }
         const answer = buildAnswer(when, season, rows, pick);
         setHero(answer.title, answer.sub, false);
         $("flow").hidden = false;
         renderFlow(when, season, rows, pick, answer);
+        renderStay(when, season, rows);
     };
 
     /* 지도 */
@@ -647,14 +778,22 @@
         requestAnimationFrame(state.refreshScrollEdges);
         // 접힌 상자 안에선 폭이 0 이라 가장자리를 못 잰다 — 펼칠 때 다시 잰다
         document.querySelector(".condition").addEventListener("toggle", () => state.refreshScrollEdges());
-        document.querySelectorAll(".pick").forEach((btn) => btn.addEventListener("click", () => {
+        document.querySelectorAll(".condition__picks .pick").forEach((btn) => btn.addEventListener("click", () => {
             toggleSet(state.who, btn.dataset.who);
             btn.setAttribute("aria-pressed", String(state.who.has(btn.dataset.who)));
+            resetMustToWho();
             syncFiltersToWho();
             renderSummary();
             renderMap();
         }));
-        ["visit-date", "visit-hour"].forEach((id) => $(id).addEventListener("change", renderSummary));
+        $("must-picks").addEventListener("click", (e) => {
+            const btn = e.target.closest(".must-pick");
+            if (btn) {
+                toggleSet(state.must, btn.dataset.must);
+                renderMust();
+            }
+        });
+        ["visit-date", "visit-hour", "visit-stay"].forEach((id) => $(id).addEventListener("change", renderSummary));
         $("visit-date").addEventListener("click", () => {
             try {
                 $("visit-date").showPicker?.();
@@ -698,6 +837,13 @@
             opt.selected = h === 10;
             $("visit-hour").append(opt);
         }
+        STAY_OPTIONS.forEach((n) => {
+            const opt = document.createElement("option");
+            opt.value = String(n);
+            opt.textContent = `${n}시간`;
+            opt.selected = n === STAY_DEFAULT;
+            $("visit-stay").append(opt);
+        });
         const now = new Date(Date.now() + 9 * 3600 * 1000);
         const daysToSat = (6 - now.getUTCDay() + 7) % 7 || 7;
         $("visit-date").value = new Date(now.getTime() + daysToSat * 86400000).toISOString().slice(0, 10);
@@ -728,6 +874,7 @@
         [stats, access, parkMap] = await Promise.all(
             ["parking_2025_stats.json", "accessibility.json", "park_map.json"].map(loadJson));
         await loadHolidays();
+        renderMustPicks();
         bind();
         renderSummary();
         renderMap();

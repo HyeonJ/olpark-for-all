@@ -8,7 +8,7 @@
     <meta name="description" content="휠체어·유모차·어르신과 함께 올림픽공원에 가기 전, 공식 공공데이터로 준비할 것을 확인해요.">
     <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-    <link rel="stylesheet" href="style.css?v=202611260937j">
+    <link rel="stylesheet" href="style.css?v=202611260954m">
 </head>
 <body>
     <a class="skip-link" href="#main">본문 바로가기</a>
@@ -70,9 +70,15 @@
                             <input id="visit-date" class="date-field__native" type="date">
                         </span>
                     </label>
+                </div>
+                <div class="condition__row condition__row--pair">
                     <label class="field">
                         <span>도착 시각</span>
                         <select id="visit-hour" class="field__input"></select>
+                    </label>
+                    <label class="field">
+                        <span>머무는 시간</span>
+                        <select id="visit-stay" class="field__input"></select>
                     </label>
                 </div>
                 <p id="day-kind" class="condition__note"></p>
@@ -95,10 +101,14 @@
 
                 <section id="flow" class="block flow" aria-labelledby="flow-title"></section>
 
+                <section id="stay" class="block stay" aria-labelledby="stay-title" hidden></section>
+
                 <section class="block prep" aria-labelledby="prepare-title">
-                    <h2 id="prepare-title">방문 전에 확인해 주세요</h2>
-                    <ul id="facts" class="fact-list"></ul>
-                    <details id="mismatch" class="mismatch"></details>
+                    <h2 id="prepare-title">꼭 필요한 것</h2>
+                    <p class="prep__intro">없으면 곤란한 것만 골라 주세요. 확인된 것과 아직 모르는 것을 나눠 보여드려요.</p>
+                    <div id="must-picks" class="must-picks h-scroll" role="group" aria-label="꼭 필요한 것 고르기"></div>
+                    <ul id="must-list" class="must-list"></ul>
+                    <div id="call-summary" class="call-summary" hidden></div>
                 </section>
 
                 <section class="block map-preview" aria-labelledby="preview-title">
@@ -170,6 +180,6 @@
         <a id="bottom-toggle" class="bottom-bar__toggle" href="#map"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg><span>시설 지도</span></a>
         <a id="bottom-call" class="bottom-bar__call" href="tel:024101114"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg><span id="bottom-call-label">공원 안내 전화하기</span></a>
     </nav>
-    <script src="app.js?v=202611260937j"></script>
+    <script src="app.js?v=202611260954m"></script>
 </body>
 </html>
