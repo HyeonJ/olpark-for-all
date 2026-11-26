@@ -254,6 +254,8 @@
         box.setAttribute("aria-labelledby", "rental-title");
     };
 
+    const MAP_LINK_KEYS = new Set(["wheelchair", "stroller", "nursing", "restroom"]);
+
     const factText = (it) => {
         if (it.key === "restroom") {
             return { title: "휠체어 이용 가능으로 등록된 화장실",
@@ -271,14 +273,21 @@
 
     const renderFacts = () => {
         const items = access.items.filter((it) => state.who.size === 0 || it.for.some((f) => state.who.has(f)));
-        const plain = items.filter((it) => it.status !== "differs");
         const differs = items.filter((it) => it.status === "differs");
-        $("facts").innerHTML = plain.length ? plain.map((it) => {
+        // 출처끼리 표현이 다른 항목도 본문에 보인다 — 접힌 상자에만 두면 유모차·시각장애인에게 필요한
+        //   수유실·수량·점자 안내가 통째로 숨는다(Darren M:1y0h 캡처로 확인). 꼬리표로 표시하고 대조는 아래 상자에서.
+        $("facts").innerHTML = items.length ? items.map((it) => {
             const t = factText(it);
-            const link = it.key === "wheelchair" ? `<a class="fact__link" href="#map">지도에서 위치 보기${icon("right")}</a>` : "";
+            const flag = it.status === "differs" ? "<span class=\"fact__flag\">출처마다 다름</span>" : "";
+            const link = MAP_LINK_KEYS.has(it.key) ? `<a class="fact__link" href="#map">지도에서 위치 보기${icon("right")}</a>` : "";
             return `<li class="fact"><div class="fact__icon">${icon(FACT_ICON[it.key] || "info")}</div>
-                <div><h3>${t.title}</h3><p>${t.text}</p>${link}</div></li>`;
-        }).join("") : "<li class=\"empty-note\">선택한 동행에 맞는 안내가 아직 없어요.</li>";
+                <div><h3>${t.title}${flag}</h3><p>${t.text}</p>${link}</div></li>`;
+        }).join("") : "<li class=\"empty-note\">함께 가는 분을 고르면 꼭 확인할 것을 골라 보여드려요.</li>";
+        if (state.who.has("visual")) {
+            // 시각장애인 동행엔 공개 자료가 점자 안내 하나뿐이라 «물어볼 곳»을 같이 둔다(번호는 관광공사 자료의 공원 안내)
+            $("facts").insertAdjacentHTML("beforeend", `<li class="fact"><div class="fact__icon">${icon("phone")}</div>
+                <div><h3>시설 위치는 공원 안내에 물어보세요</h3><p>공개 자료에는 점자 안내 장소 외의 시각장애인 편의 정보가 없어요.<br>공원 안내 02-410-1114</p></div></li>`);
+        }
         const box = $("mismatch");
         box.hidden = differs.length === 0;
         if (!differs.length) {

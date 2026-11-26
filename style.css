@@ -1717,3 +1717,16 @@ select.field__input {
     cursor: grabbing;
     user-select: none;
 }
+
+.fact__flag {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 6px;
+    background: var(--orange-soft);
+    color: var(--orange);
+    font-size: 12px;
+    font-weight: 700;
+    vertical-align: 2px;
+    white-space: nowrap;
+}
