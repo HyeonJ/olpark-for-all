@@ -7,9 +7,7 @@
     const SEASONS = { 12: "겨울", 1: "겨울", 2: "겨울", 3: "봄", 4: "봄", 5: "봄",
         6: "여름", 7: "여름", 8: "여름", 9: "가을", 10: "가을", 11: "가을" };
     const OPEN = { first: 6, last: 21 };
-    const VISIT = { first: 9, last: 18 };
     const MIN_DAYS = 8;
-    const NEAR_PEAK = 0.9;
     const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
     const WHO_ORDER = ["wheelchair", "stroller", "senior", "visual"];
     // 동행 «유형»을 사람 명칭으로 부른다(관광공사 열린관광·서울동행맵 표기) — 사람 수가 아니라 세는 말을 붙이지 않는다
@@ -118,31 +116,49 @@
         .filter((s) => s.season === season && s.dayType === dayType && s.hour >= OPEN.first && s.hour <= OPEN.last)
         .sort((a, b) => a.hour - b.hour);
 
-    const compareWord = (hour, peakHour) => {
-        if (hour < 12 && peakHour >= 12) {
-            return "오후";
+    // 고른 시각이 «그날 시간대들 안에서» 어디쯤인지 — 제일 붐빈 시각과만 대면 거의 모든 시각이 «덜 붐볐다»가 돼서
+    //   가이드가 안 된다(Darren M:7dpb). 그래서 «하루 중 위치» + «앞뒤 2시간 안의 더 한산한 때»로 말한다.
+    const NEAR_WINDOW = 2;
+    // 대안으로 권하는 시각은 공원을 둘러볼 수 있는 때로만 — 새벽·마감 직전(차량 22시 마감)을 권하면 한산해도 쓸모가 없다
+    const SUGGEST = { first: 9, last: 19 };
+    const BETTER_BY = 0.1;
+    const dayPosition = (rows, pick) => {
+        const below = rows.filter((s) => s.median < pick.median).length;
+        const share = below / (rows.length - 1);
+        if (share >= 2 / 3) {
+            return "많은 편이었어요";
         }
-        return hourWord(peakHour);
+        if (share <= 1 / 3) {
+            return "적은 편이었어요";
+        }
+        return "중간쯤이었어요";
+    };
+
+    const nearbyBetter = (rows, pick) => {
+        const near = rows.filter((s) => s.hour !== pick.hour && Math.abs(s.hour - pick.hour) <= NEAR_WINDOW
+            && s.hour >= SUGGEST.first && s.hour <= SUGGEST.last);
+        if (!near.length) {
+            return null;
+        }
+        const best = near.reduce((a, b) => (b.median < a.median ? b : a));
+        return best.median <= pick.median * (1 - BETTER_BY) ? best : null;
+    };
+
+    const shiftWord = (from, to) => {
+        const d = to - from;
+        return d > 0 ? `${d}시간 늦게` : `${-d}시간 일찍`;
     };
 
     const buildAnswer = (when, season, rows, pick) => {
-        const peak = rows.reduce((a, b) => (b.median > a.median ? b : a));
-        const ratio = pick.median / peak.median;
-        const pct = Math.round(ratio * 100);
+        const better = nearbyBetter(rows, pick);
         const base = `작년 ${season} ${when.dayType} 기준이에요.`;
-        if (pick.hour === peak.hour || ratio >= NEAR_PEAK) {
-            const visitRows = rows.filter((s) => s.hour >= VISIT.first && s.hour <= VISIT.last);
-            const quiet = visitRows.reduce((a, b) => (b.median < a.median ? b : a));
-            return {
-                title: `${hourWord(when.hour)}는<br><strong>하루 중 차가 가장 많았던 때예요</strong>`,
-                sub: `${base}<br>${VISIT.first}~${VISIT.last}시 중에는 ${quiet.hour}시가 가장 한산했어요.`,
-                peak,
-            };
-        }
+        const hint = better
+            ? `${shiftWord(pick.hour, better.hour)}(${hourWord(better.hour)}) 오면 차가 약 ${Math.round((1 - better.median / pick.median) * 100)}% 적었어요.`
+            : `앞뒤 ${NEAR_WINDOW}시간 중에는 이때가 한산한 편이에요.`;
         return {
-            title: `${hourWord(when.hour)}는<br><strong>${compareWord(when.hour, peak.hour)}보다 덜 붐볐어요</strong>`,
-            sub: `${base}<br>${when.hour}시 주차대수는 ${peak.hour}시의 약 ${pct}%였어요.`,
-            peak,
+            title: `${hourWord(when.hour)}는<br><strong>하루 중 차가 ${dayPosition(rows, pick)}</strong>`,
+            sub: `${base}<br>${hint}`,
+            better,
         };
     };
 
@@ -187,12 +203,11 @@
 
     const renderFlow = (when, season, rows, pick, answer) => {
         const t = stats.levelThresholds.high_min;
-        const diff = answer.peak.median - pick.median;
-        const comparison = pick.hour === answer.peak.hour
-            ? "<strong>가장 많았던 시간이에요</strong>"
-            : `${answer.peak.hour}시보다 <strong>${fmt(diff)}대 적었어요</strong>`;
+        const comparison = answer.better
+            ? `${hourWord(answer.better.hour)}엔 <strong>${fmt(pick.median - answer.better.median)}대 적었어요</strong>`
+            : `<strong>앞뒤 ${NEAR_WINDOW}시간 중 차가 적은 편이에요</strong>`;
         const year = stats.period[0].slice(0, 4);
-        $("flow").innerHTML = `<div class="section-head"><h2 id="flow-title">${when.hour}시 주차대수</h2></div>
+        $("flow").innerHTML = `<div class="section-head"><h2 id="flow-title">${hourWord(when.hour)} 주차대수</h2></div>
             <div class="metric"><strong>${fmt(pick.median)}<small>대</small></strong><span>작년 중앙값</span></div>
             <p class="range">작년 기록의 가운데 절반은 ${fmt(pick.p25)}~${fmt(pick.p75)}대였어요</p>
             ${chartSvg(rows, pick, t)}
@@ -314,8 +329,8 @@
         const tail = esc(who);
         // aria-label 은 일반 span 에선 낭독되지 않는다 — 누를 수 있는 summary 에 단다
         document.querySelector(".condition__summary").setAttribute("aria-label",
-            `${when.month}월 ${when.dayNum}일 ${when.weekday}요일${when.holidayName || ""}, ${when.hour}시 도착, ${labels.length ? `함께 가는 분 ${labels.join(", ")}` : "동행 선택 안 함"}`);
-        $("condition-text").innerHTML = `<b>${when.month}.${when.dayNum} (${when.weekday})${holiday}</b>${dot}${when.hour}시 도착${dot}${tail}`;
+            `${when.month}월 ${when.dayNum}일 ${when.weekday}요일${when.holidayName || ""}, ${hourWord(when.hour)} 도착, ${labels.length ? `함께 가는 분 ${labels.join(", ")}` : "동행 선택 안 함"}`);
+        $("condition-text").innerHTML = `<b>${when.month}.${when.dayNum} (${when.weekday})${holiday}</b>${dot}${hourWord(when.hour)} 도착${dot}${tail}`;
         $("day-kind").innerHTML = dayKindText(when);
     };
 
@@ -670,7 +685,7 @@
         for (let h = OPEN.first; h <= OPEN.last; h += 1) {
             const opt = document.createElement("option");
             opt.value = String(h);
-            opt.textContent = `${h}시`;
+            opt.textContent = hourWord(h);
             opt.selected = h === 10;
             $("visit-hour").append(opt);
         }
