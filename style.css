@@ -10,6 +10,8 @@
     --orange-soft: #fff3df;
     --blue: #285e93;
     --map-bg: #edf1e8;
+    /* 하단 고정 바 높이 = 위 패딩 10 + 버튼 52 + 아래 패딩 + 위 테두리 1 — 바와 푸터 여백이 같은 값을 쓴다 */
+    --bar-h: calc(63px + max(14px, env(safe-area-inset-bottom)));
     --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
     color-scheme: light;
 }
@@ -523,21 +525,23 @@ select.field__input {
     font-weight: 700;
 }
 
-.event-note {
-    margin: 0 24px 20px;
+.hero__event {
+    margin-top: 12px;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: 10px;
+    align-items: flex-start;
+    gap: 6px;
     color: var(--secondary);
     font-size: 13px;
     line-height: 1.6;
 }
 
-.event-note a {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
+.hero__event .icon {
+    width: 15px;
+    height: 15px;
+    margin-top: 3px;
+}
+
+.hero__event a {
     color: var(--green);
     font-weight: 650;
     text-decoration: underline;
@@ -575,26 +579,6 @@ select.field__input {
     line-height: 1.55;
 }
 
-.call-inline {
-    min-height: 44px;
-    margin-top: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: 1px solid #e4ceaa;
-    border-radius: 9px;
-    background: #fff;
-    color: #70420a;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.call-inline .icon {
-    width: 17px;
-    height: 17px;
-}
-
 /* 섹션 공통 */
 .block {
     padding: 26px 20px;
@@ -613,7 +597,15 @@ select.field__input {
 
 .flow {
     padding-top: 23px;
+    padding-bottom: 6px;
     border-top: 8px solid var(--canvas);
+}
+
+/* «머무는 동안의 차량»은 바로 위 차량 흐름의 이어지는 칸이라 사이를 좁히고 얇은 선만 둔다(Darren M:53jw) */
+.stay {
+    margin: 0 20px;
+    padding: 18px 0 26px;
+    border-top: 1px solid var(--line);
 }
 
 .metric {
@@ -902,14 +894,23 @@ select.field__input {
 }
 
 .must__link {
+    position: relative;
     grid-column: 1 / -1;
-    min-height: 44px;
+    justify-self: start;
+    min-height: 22px;
+    margin-top: 4px;
     display: inline-flex;
     align-items: center;
     gap: 3px;
     color: var(--green);
     font-size: 14px;
     font-weight: 650;
+}
+
+.must__link::after {
+    content: "";
+    position: absolute;
+    inset: -11px -8px;
 }
 
 .must__link .icon {
@@ -1005,6 +1006,11 @@ select.field__input {
     font-weight: 700;
 }
 
+.window--pick .window__label,
+.window--pick .window__num {
+    color: var(--green);
+}
+
 .window--pick .window__fill {
     background: var(--green);
 }
@@ -1049,30 +1055,24 @@ select.field__input {
     height: 100%;
 }
 
-.thumb-label {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    padding: 6px 10px;
+.map-preview__more {
+    min-height: 44px;
     display: flex;
     align-items: center;
-    gap: 5px;
-    border: 1px solid #dce3db;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 2px 6px #223c2612;
-    font-size: 13px;
+    justify-content: flex-end;
+    gap: 3px;
+    color: var(--green);
+    font-size: 14px;
     font-weight: 650;
 }
 
-.thumb-label .icon {
+.map-preview__more .icon {
     width: 16px;
     height: 16px;
-    color: var(--green);
 }
 
 .map-preview__note {
-    margin-top: 12px;
+    margin-top: 0;
     color: var(--secondary);
     font-size: 14px;
 }
@@ -1161,7 +1161,7 @@ select.field__input {
 }
 
 .footer {
-    padding: 18px 20px 130px;
+    padding: 18px 20px calc(var(--bar-h) + 16px);
     background: var(--canvas);
     color: var(--secondary);
     font-size: 12px;
@@ -1191,22 +1191,13 @@ select.field__input {
 }
 
 /* 지도 화면 */
-.map-heading {
-    padding: 22px 20px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-
-.map-heading h1 {
-    font-size: 22px;
-    letter-spacing: -0.04em;
-}
-
-.map-heading span {
-    color: var(--secondary);
-    font-size: 13px;
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
 .map-filters {

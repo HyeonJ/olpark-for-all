@@ -58,22 +58,22 @@
     };
     const PLACE_INFO = {
         "info-peace": { rows: [
-            ["휠체어 대여는 전화로 확인해 주세요", "수량과 당일 대여 가능 여부는 공개되지 않았어요."],
-            ["유모차 대여 4대", "한국관광공사 API 기준이에요. 공식 웹은 센터별 수량 없이 ‘4대’로만 안내해요."],
-            ["수유실", "안내센터 안에 있어요."],
+            ["휠체어 대여는 전화로 확인해 주세요", "수량과 당일 대여 가능 여부는 공개되지 않았어요.", "bag"],
+            ["유모차 대여 4대", "한국관광공사 자료 기준이에요. 관광공사 누리집은 센터별 수량 없이 ‘4대’로만 안내해요.", "stroller"],
+            ["수유실", "안내센터 안에 있어요.", "bottle"],
         ] },
         "info-east1": { rows: [
-            ["휠체어 대여는 전화로 확인해 주세요", "만남의광장 안이에요. 수량과 당일 대여 가능 여부는 공개되지 않았어요."],
-            ["유모차 대여 3대", "한국관광공사 API 기준이에요. 공식 웹에는 이 센터의 수량이 없어요."],
-            ["수유실", "안내센터 안에 있어요."],
+            ["휠체어 대여는 전화로 확인해 주세요", "만남의광장 안이에요. 수량과 당일 대여 가능 여부는 공개되지 않았어요.", "bag"],
+            ["유모차 대여 3대", "한국관광공사 자료 기준이에요. 관광공사 누리집에는 이 센터의 수량이 없어요.", "stroller"],
+            ["수유실", "안내센터 안에 있어요.", "bottle"],
         ] },
-        museum: { rows: [["1층 수유실", "한성백제박물관 안이에요."]] },
-        "p-south2": { rows: [["남2문 주차장", "실시간 주차 현황은 공원 전체 합계만 공개돼요."]] },
-        hall: { rows: [["점자 안내", "이 장소가 점자 안내 목록에 있는지는 확인되지 않았어요. 공원 안내로 문의해 주세요."]] },
-        arthall: { rows: [["점자 안내", "점자 안내 목록에 있는 곳이에요. 출처마다 ‘점자안내판’, ‘점자 홍보물 수령장소’로 달라서 전화로 확인해 주세요."]] },
-        kspo: { rows: [["공연이 있는 날", "주변이 붐빌 수 있어요. 일정은 공연 일정 페이지에서 확인해 주세요."]] },
+        museum: { rows: [["1층 수유실", "한성백제박물관 안이에요.", "bottle"]] },
+        "p-south2": { rows: [["남2문 주차장", "실시간 주차 현황은 공원 전체 합계만 공개돼요.", "parking"]] },
+        hall: { rows: [["점자 안내", "이 장소가 점자 안내 목록에 있는지는 확인되지 않았어요. 공원 안내로 문의해 주세요.", "braille"]] },
+        arthall: { rows: [["점자 안내", "점자 안내 목록에 있는 곳이에요. 출처마다 ‘점자안내판’, ‘점자 홍보물 수령장소’로 달라서 전화로 확인해 주세요.", "braille"]] },
+        kspo: { rows: [["공연이 있는 날", "주변이 붐빌 수 있어요. 일정은 공연 일정 페이지에서 확인해 주세요.", "music"]] },
     };
-    const TOILET_INFO = { rows: [["현장 확인 전 자료예요", "오픈스트리트맵에 ‘휠체어 이용 가능’으로 등록된 곳이에요. 정확한 이용 가능 여부는 현장에서 확인해 주세요."]] };
+    const TOILET_INFO = { rows: [["현장 확인 전 자료예요", "오픈스트리트맵에 ‘휠체어 이용 가능’으로 등록된 곳이에요. 정확한 이용 가능 여부는 현장에서 확인해 주세요.", "toilet"]] };
 
     const $ = (id) => document.getElementById(id);
     const state = {
@@ -86,6 +86,7 @@
     let stats;
     let access;
     let parkMap;
+    let toiletNames = new Map();
     let holidays = { years: [], map: new Map(), loaded: false };
 
     const esc = (text) => String(text).replace(/[&<>"']/g, (c) => ({
@@ -171,7 +172,7 @@
         if (share <= 1 / 3) {
             return "적은 편이었어요";
         }
-        return "중간쯤이었어요";
+        return "보통 수준이었어요";
     };
 
     const nearbyBetter = (rows, pick) => {
@@ -196,7 +197,7 @@
             ? `<strong class="hero__alt">${shiftWord(pick.hour, better.hour)}(${hourWord(better.hour)})</strong> 오면 차가 약 ${Math.round((1 - better.median / pick.median) * 100)}% 적었어요.${better.hour >= 18 ? " (대여 운영시간은 전화로 확인)" : ""}`
             : `앞뒤 ${NEAR_WINDOW}시간 중에는 이때가 한산한 편이에요.`;
         return {
-            title: `${hourWord(when.hour)}는<br><strong>하루 중 차가 ${dayPosition(rows, pick)}</strong>`,
+            title: `${hourWord(when.hour)}는<br><strong>하루 중 차량이 ${dayPosition(rows, pick)}</strong>`,
             sub: `${base}<br>${hint}`,
             better,
         };
@@ -241,11 +242,12 @@
             <tbody>${body}</tbody></table>`;
     };
 
-    const renderFlow = (when, season, rows, pick, answer) => {
+    const renderFlow = (when, season, rows, pick) => {
         const t = stats.levelThresholds.high_min;
-        const comparison = answer.better
-            ? `${hourWord(answer.better.hour)}엔 <strong>${fmt(pick.median - answer.better.median)}대 적었어요</strong>`
-            : `<strong>앞뒤 ${NEAR_WINDOW}시간 중 차가 적은 편이에요</strong>`;
+        const most = rows.reduce((a, b) => (b.median > a.median ? b : a));
+        const calm = rows.filter((s) => s.hour >= SUGGEST.first && s.hour <= SUGGEST.last);
+        const least = calm.reduce((a, b) => (b.median < a.median ? b : a));
+        const comparison = `가장 많았던 때: <strong>${hourWord(most.hour)} ${fmt(most.median)}대</strong><br>가장 적었던 때(${SUGGEST.first}~${SUGGEST.last}시): <strong>${hourWord(least.hour)} ${fmt(least.median)}대</strong>`;
         const year = stats.period[0].slice(0, 4);
         $("flow").innerHTML = `<div class="section-head"><h2 id="flow-title">${hourWord(when.hour)} 주차대수</h2></div>
             <div class="metric"><strong>${fmt(pick.median)}<small>대</small></strong><span>작년 중앙값</span></div>
@@ -309,10 +311,16 @@
         const shown = [chosen, ...stayCandidates(rows, when)].sort((a, b) => a.start - b.start);
         const lowest = shown.reduce((a, b) => (b.avg < a.avg ? b : a));
         const top = Math.max(...shown.map((w) => w.avg));
-        const better = lowest !== chosen && lowest.avg <= chosen.avg * (1 - STAY_BETTER_BY);
-        const comparison = better
-            ? `<strong>${rangeWord(lowest.start, lowest.start + len)}</strong>에 머물면 차가 약 ${Math.round((1 - lowest.avg / chosen.avg) * 100)}% 적었어요`
-            : "같은 길이로 머문다면 이때가 한산한 편이에요";
+        const lowestRange = rangeWord(lowest.start, lowest.start + len);
+        const gain = Math.round((1 - lowest.avg / chosen.avg) * 100);
+        let comparison;
+        if (lowest === chosen) {
+            comparison = "같은 길이로 머문다면 <strong>이때가 가장 한산했어요</strong>";
+        } else if (gain >= STAY_BETTER_BY * 100) {
+            comparison = `<strong>${lowestRange}</strong>에 머물면 차가 약 ${gain}% 적었어요`;
+        } else {
+            comparison = `${lowestRange}가 약 ${gain}% 적었지만 차이는 크지 않아요`;
+        }
         const capped = when.stay > len
             ? `<p class="stay__note">공원 차량 출입은 ${OPEN.last + 1}시까지라 ${hourWord(OPEN.last + 1)}까지만 셌어요</p>` : "";
         const items = shown.map((w) => stayRowHtml(w, len, { pick: w === chosen, best: w === lowest }, top)).join("");
@@ -329,15 +337,15 @@
         const stroller = state.who.has("stroller");
         if (wheel && stroller) {
             return { title: "휠체어·유모차 대여는 전화로 확인해 주세요",
-                text: "대여 장소는 2곳이에요.<br>유모차는 안내 자료마다 수량이 달라요(API 4대+3대, 공식 웹 4대). 수량은 전화로 확인해 주세요." };
+                text: "대여 장소는 2곳이에요.<br>유모차는 안내 자료마다 수량이 달라요(관광공사 자료 4대+3대, 관광공사 누리집 4대). 수량은 아래 전화 버튼으로 물어볼 수 있어요." };
         }
         if (stroller) {
             return { title: "유모차 대여는 전화로 확인해 주세요",
-                text: "대여 장소는 2곳이에요.<br>안내 자료마다 수량이 달라요(API 4대+3대, 공식 웹 4대). 수량은 전화로 확인해 주세요." };
+                text: "대여 장소는 2곳이에요.<br>안내 자료마다 수량이 달라요(관광공사 자료 4대+3대, 관광공사 누리집 4대). 수량은 아래 전화 버튼으로 물어볼 수 있어요." };
         }
         if (wheel) {
             return { title: "휠체어 대여는 전화로 확인해 주세요",
-                text: "대여 장소는 2곳이에요.<br>당일 빌릴 수 있는지는 미리 확인이 필요해요." };
+                text: "대여 장소는 2곳이에요.<br>당일 빌릴 수 있는지는 미리 확인이 필요해요. 아래 전화 버튼으로 물어볼 수 있어요." };
         }
         return null;
     };
@@ -346,13 +354,11 @@
         const copy = rentalCopy();
         const box = $("rental-call");
         box.hidden = !copy;
-        $("bottom-call-label").textContent = copy ? "대여 문의 전화하기" : "공원 안내 전화하기";
         if (!copy) {
             box.innerHTML = "";
             return;
         }
-        box.innerHTML = `<div class="rental-call__head">${icon("bag")}<div><h2 id="rental-title">${copy.title}</h2><p>${copy.text}</p></div></div>
-            <a class="call-inline" href="tel:024101114">${icon("phone")}공원 안내 전화하기</a>`;
+        box.innerHTML = `<div class="rental-call__head">${icon("bag")}<div><h2 id="rental-title">${copy.title}</h2><p>${copy.text}</p></div></div>`;
         box.setAttribute("aria-labelledby", "rental-title");
     };
 
@@ -378,7 +384,7 @@
             ask("도착할 곳 근처에 있는지 → 전화로 확인", "도착할 곳 근처 장애인 화장실");
         } else if (item.status === "differs") {
             badge = ["diff", "출처마다 다름"];
-            detail = `관광공사 API «${item.api}» · 공식 웹 «${item.web}»`;
+            detail = `관광공사 자료 «${item.api}» · 관광공사 누리집 «${item.web}»`;
         } else {
             badge = ["ok", "확인됨"];
             detail = item.api;
@@ -403,8 +409,7 @@
     };
 
     const callSummaryHtml = (questions) => `<strong>전화 한 번에 물어볼 것 ${questions.length}가지</strong> <span class="nowrap">· 공원 안내 ${PARK_PHONE}</span>
-        <ol>${questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>
-        <a class="call-inline" href="tel:024101114">${icon("phone")}공원 안내 전화하기</a>`;
+        <ol>${questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>`;
 
     const renderMust = () => {
         document.querySelectorAll(".must-pick").forEach((btn) =>
@@ -497,20 +502,37 @@
         const answer = buildAnswer(when, season, rows, pick);
         setHero(answer.title, answer.sub, false);
         $("flow").hidden = false;
-        renderFlow(when, season, rows, pick, answer);
+        renderFlow(when, season, rows, pick);
         renderStay(when, season, rows);
     };
 
     /* 지도 */
     const visiblePins = () => parkMap.pins.filter((p) => state.filters.has(p.kind));
 
-    const pinName = (pin) => {
-        if (pin.kind !== "toilet") {
-            return pin.label;
-        }
-        const index = parkMap.pins.filter((p) => p.kind === "toilet").findIndex((p) => p.id === pin.id) + 1;
-        return `${pin.label} ${index}`;
+    const placeShortName = (pin) => pin.label.split("(")[0].replace(/\s*(공원)?안내센터$/, "").trim();
+
+    // 화장실은 «1·2·3» 번호가 아무 뜻이 없어서, 지도에 이름 붙은 가장 가까운 장소로 부른다(같은 장소면 북쪽/남쪽으로 가른다)
+    const buildToiletNames = () => {
+        const places = parkMap.pins.filter((p) => p.kind !== "toilet");
+        const toilets = parkMap.pins.filter((p) => p.kind === "toilet").map((t) => {
+            const near = places.reduce((a, b) =>
+                (Math.hypot(b.x - t.x, b.y - t.y) < Math.hypot(a.x - t.x, a.y - t.y) ? b : a));
+            return { pin: t, base: `${placeShortName(near)} 근처 화장실` };
+        });
+        toiletNames = new Map();
+        toilets.forEach(({ pin, base }) => {
+            const same = toilets.filter((o) => o.base === base);
+            if (same.length < 2) {
+                toiletNames.set(pin.id, base);
+                return;
+            }
+            const northmost = same.reduce((a, b) => (b.pin.y < a.pin.y ? b : a)).pin;
+            toiletNames.set(pin.id, `${base} (${same.length === 2 ? (pin === northmost ? "북쪽" : "남쪽")
+                : `${same.filter((o) => o.pin.y < pin.y).length + 1}번째`})`);
+        });
     };
+
+    const pinName = (pin) => (pin.kind === "toilet" ? toiletNames.get(pin.id) : pin.label);
 
     const labelAnchor = (pin) => {
         if (pin.x < 300) {
@@ -555,7 +577,7 @@
     };
 
     const renderThumb = () => {
-        $("map-thumb").innerHTML = `${mapSvg(false)}<span class="thumb-label">${icon("pin")}지도에서 보기</span>`;
+        $("map-thumb").innerHTML = mapSvg(false);
     };
 
     const renderFilters = () => {
@@ -577,7 +599,7 @@
             return;
         }
         const info = PLACE_INFO[pin.id] || TOILET_INFO;
-        const rows = info.rows.map(([a, b]) => `<div class="place-row">${icon("info")}<div><b>${esc(a)}</b><p>${esc(b)}</p></div></div>`).join("");
+        const rows = info.rows.map(([a, b, ic]) => `<div class="place-row">${icon(ic)}<div><b>${esc(a)}</b><p>${esc(b)}</p></div></div>`).join("");
         const naver = pin.kind === "toilet" ? ""
             : `<a href="${naverUrl(pin)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(pin.label)} 네이버 지도에서 보기, 새 창">${icon("map")}네이버 지도</a>`;
         panel.innerHTML = `<div class="handle" aria-hidden="true"></div>
@@ -638,12 +660,12 @@
             <p><strong>시간대별 차량 기록</strong><br>${esc(stats.source)}. ${year}년 기록 중 주차대수만 썼어요. 같은 계절·같은 날 종류(평일 또는 주말·휴일)의 시간대별 중앙값을 비교해요.</p>
             <p><strong>제외한 날</strong><br>수집 이상이나 집계 변경이 의심되는 ${q.flaggedDays}일을 뺐어요. 관측 20시간 미만 ${q.byReason.incomplete}일, 값이 날마다 줄어드는 수집 장애 의심 ${q.byReason.decay_run}일, 집계 범위가 바뀐 것으로 보이는 ${esc(q.levelShiftMonths.join("·"))} ${q.byReason.level_shift}일이에요(두 가지 이상에 걸린 날은 겹쳐 세어져요).</p>
             <p><strong>방문객 수를 쓰지 않은 이유</strong><br>원자료의 방문객 수가 주차대수에 고정 배율을 곱한 값이었어요(${ratio}).</p>
-            <p><strong>편의시설</strong><br>한국관광공사 무장애 여행 정보 API와 공식 웹을 대조했어요. 웹 수정 ${esc(web.updatedAt)}, 대조 ${esc(api.checkedAt)}. 출처마다 다른 수량·표현은 각각 보여 드려요.</p>
+            <p><strong>편의시설</strong><br>한국관광공사 무장애 여행 정보(공공데이터 API)와 관광공사 누리집을 대조했어요. 웹 수정 ${esc(web.updatedAt)}, 대조 ${esc(api.checkedAt)}. 출처마다 다른 수량·표현은 각각 보여 드려요.</p>
             <p><strong>시설 지도</strong><br>© OpenStreetMap contributors. 휠체어 화장실은 휠체어 이용 가능으로 등록된 지점이며 현장 검증 전이에요. 경사도·노면·연속된 무장애 동선은 확인되지 않았어요.</p>
             <p><strong>공휴일</strong><br>한국천문연구원 특일 정보${holidays.years.length ? ` (${esc(holidays.years.join("·"))}년)` : ""}.</p>
             ${holidayGap}
             <p><strong>실시간 주차 현황</strong><br>한국체육산업개발 실시간 주차현황의 동2·남2·북2 합계예요. 불러온 시각을 함께 보여 드려요.</p>`;
-        $("map-sources-body").innerHTML = `<p>대여·수유실: 한국관광공사 무장애 여행 정보 API·공식 웹(웹 수정 ${esc(web.updatedAt)}, 대조 ${esc(api.checkedAt)}). 지도·시설 좌표: © OpenStreetMap contributors.</p>
+        $("map-sources-body").innerHTML = `<p>대여·수유실: 한국관광공사 무장애 여행 정보(공공데이터 API)·관광공사 누리집(누리집 수정 ${esc(web.updatedAt)}, 대조 ${esc(api.checkedAt)}). 지도·시설 좌표: © OpenStreetMap contributors.</p>
             <p>휠체어 화장실은 오픈스트리트맵에 ‘휠체어 이용 가능’으로 등록된 지점이며 현장 검증 전이에요. 공식 정보에는 정확한 위치가 없어요. 지도에 표시한 주차장은 남2문 주차장이에요.</p>
             <p>경사도·노면 정보와 연속된 무장애 동선은 제공하지 않아요. 외부 지도를 열어도 휠체어로 갈 수 있는 경로가 보장되지는 않아요.</p>`;
     };
@@ -873,6 +895,7 @@
         fillWhen();
         [stats, access, parkMap] = await Promise.all(
             ["parking_2025_stats.json", "accessibility.json", "park_map.json"].map(loadJson));
+        buildToiletNames();
         await loadHolidays();
         renderMustPicks();
         bind();
