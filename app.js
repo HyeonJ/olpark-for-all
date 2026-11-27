@@ -374,49 +374,55 @@
 
     const toiletPinCount = () => parkMap.pins.filter((p) => p.kind === "toilet").length;
 
-    // «이용 가능» 같은 판단어는 쓰지 않는다 — 자료에 적힌 것과 비어 있는 것만 나눠 보여준다
+    // «이용 가능» 같은 판단어는 쓰지 않는다 — 자료에 적힌 것과 비어 있는 것만 나눠 보여준다.
+    //   칸에는 «어디 있나» 한 줄만 앞에 두고 자료 원문은 접어 둔다(Darren M:59fk · 시안 A M:bv5c).
+    //   fact·badge·ask 는 data/accessibility.json 의 api·web·note 를 줄인 말이다 — 원문은 «자료 원문 보기»에 그대로 있다
+    const MUST_COPY = {
+        wheelchair: { fact: "평화의광장 앞·동1문 안내센터에서 빌려요", badge: ["ok", "장소 확인됨"], ask: "오늘 빌릴 수 있는지", question: "휠체어 당일 대여 가능 여부" },
+        stroller: { fact: "평화의광장·동1문 안내센터에서 빌려요", badge: ["diff", "대수는 자료마다 달라요"], ask: "오늘 빌릴 수 있는지", question: "유모차 당일 대여 가능 여부" },
+        restroom: { badge: ["none", "위치 공식 자료 없음"], ask: "도착할 곳 근처에 있는지", question: "도착할 곳 근처 장애인 화장실" },
+        parking: { fact: "주차 140칸이 있어요", badge: ["diff", "전용인지 불분명"], ask: "140칸이 장애인 전용인지", question: "장애인 전용 주차면 수" },
+        nursing: { fact: "안내센터 · 한성백제박물관 1층", badge: ["diff", "위치는 한 자료에만"], ask: "수유실 정확한 위치", question: "수유실 정확한 위치" },
+        entrance: { fact: "출입구까지 턱이 없어요", badge: ["ok", "확인됨"] },
+        ramp: { fact: "주출입구 접근로에 경사로가 있어요", badge: ["ok", "확인됨"] },
+        braille: { fact: "우리금융아트홀 · 핸드볼·테니스·실내 테니스 경기장", badge: ["diff", "안내판인지 홍보물인지 달라요"], ask: "안내판인지 홍보물인지", question: "점자 안내판인지 홍보물인지" },
+    };
+
     const mustRow = (def) => {
         const item = access.items.find((it) => it.key === def.key);
         if (!item) {
-            return { name: def.label, badge: ["none", "공개 자료 없음"], detail: "관광공사 자료에서 찾지 못했어요.", todos: [], questions: [] };
+            return { id: def.id, name: def.label, badge: ["none", "공개 자료 없음"], fact: "관광공사 자료에서 찾지 못했어요.", source: "", ask: "", questions: [] };
         }
-        const questions = [];
-        const todos = [];
-        const ask = (line, question) => {
-            todos.push(line);
-            questions.push(question);
+        const copy = MUST_COPY[def.id] || {};
+        const fact = def.id === "restroom"
+            ? `있다는 자료뿐 · 지도엔 등록된 ${toiletPinCount()}곳(현장 확인 전)`
+            : copy.fact || item.api;
+        const source = item.status === "differs" || def.id === "restroom"
+            ? `관광공사 자료 «${item.api}» · 관광공사 누리집 «${item.web}»${def.id === "restroom" ? " · 위치는 오픈스트리트맵 등록(현장 확인 전)" : ""}`
+            : `관광공사 자료 «${item.api}»`;
+        return {
+            id: def.id,
+            name: def.label,
+            badge: copy.badge || (item.status === "differs" ? ["diff", "출처마다 다름"] : ["ok", "확인됨"]),
+            fact,
+            source,
+            ask: copy.ask || "",
+            questions: copy.question ? [copy.question] : [],
+            link: Boolean(def.link),
         };
-        let badge;
-        let detail;
-        if (def.id === "restroom") {
-            badge = ["none", "위치 공식 자료 없음"];
-            detail = `관광공사 자료엔 «있음»만 있고, 위치는 오픈스트리트맵 등록 ${toiletPinCount()}곳(현장 확인 전)`;
-            ask("도착할 곳 근처에 있는지 → 전화로 확인", "도착할 곳 근처 장애인 화장실");
-        } else if (item.status === "differs") {
-            badge = ["diff", "출처마다 다름"];
-            detail = `관광공사 자료 «${item.api}» · 관광공사 누리집 «${item.web}»`;
-        } else {
-            badge = ["ok", "확인됨"];
-            detail = item.api;
-        }
-        // 항목마다 따로 정한 확인거리가 있으면 그것으로 말하고, 없는 «출처마다 다름»만 일반 문구를 쓴다
-        if (def.rental) {
-            ask("당일 빌릴 수 있는지는 공개되지 않아요 → 전화로 확인", `${def.rental} 당일 대여 가능 여부`);
-        } else if (def.id === "parking") {
-            ask("140칸이 장애인 전용인지 → 전화로 확인", "장애인 전용 주차면 수");
-        } else if (item.status === "differs") {
-            ask("정확한 내용은 → 전화로 확인", `${def.label} 정확한 내용`);
-        }
-        return { id: def.id, name: def.label, badge, detail, todos, questions, link: Boolean(def.link) };
     };
 
     const mustRowHtml = (row) => {
-        const link = row.link && MUST_MAP[row.id]
-            ? `<button class="must__link" type="button" data-go-kind="${MUST_MAP[row.id].join(" ")}" data-go-from="${esc(row.name)}">지도에서 위치 보기${icon("right")}</button>` : "";
-        const todos = row.todos.map((t) => `<span class="must__todo">${icon("phone")}${esc(t)}</span>`).join("");
+        const map = row.link && MUST_MAP[row.id]
+            ? `<button class="must__chip must__chip--map" type="button" data-go-kind="${MUST_MAP[row.id].join(" ")}" data-go-from="${esc(row.name)}">지도에서 보기${icon("right")}</button>` : "";
+        const ask = row.ask
+            ? `<a class="must__chip" href="tel:${PARK_PHONE.replace(/-/g, "")}" aria-label="공원 안내에 전화로 물어볼 것: ${esc(row.ask)}">${icon("phone")}물어볼 것: ${esc(row.ask)}</a>` : "";
+        const acts = map || ask ? `<div class="must__acts">${map}${ask}</div>` : "";
+        const src = row.source
+            ? `<details class="must__src"><summary>자료 원문 보기${icon("down")}</summary><p>${esc(row.source)}</p></details>` : "";
         return `<li class="must"><span class="must__name">${esc(row.name)}</span>
             <span class="must__state must__state--${row.badge[0]}">${esc(row.badge[1])}</span>
-            <span class="must__detail">${esc(row.detail)}</span>${todos}${link}</li>`;
+            <p class="must__fact">${esc(row.fact)}</p>${acts}${src}</li>`;
     };
 
     const callSummaryHtml = (questions) => `<strong>전화 한 번에 물어볼 것 ${questions.length}가지</strong> <span class="nowrap">· 공원 안내 ${PARK_PHONE}</span>

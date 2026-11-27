@@ -1058,49 +1058,87 @@ select.field__input {
     word-break: keep-all;
 }
 
-.must__todo {
+.must__fact {
     grid-column: 1 / -1;
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
+    margin: 0;
     color: var(--ink);
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.55;
+    font-size: 15px;
+    line-height: 1.5;
     word-break: keep-all;
 }
 
-.must__todo .icon {
+.must__acts {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.must__chip {
+    min-height: 36px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.must__chip--map {
+    border-color: #bcd6c5;
+    color: var(--green);
+}
+
+.must__chip .icon {
     width: 15px;
     height: 15px;
     flex-shrink: 0;
-    margin-top: 3px;
 }
 
-.must__link {
-    position: relative;
+.must__src {
     grid-column: 1 / -1;
-    justify-self: start;
-    min-height: 22px;
-    margin-top: 4px;
+    color: var(--secondary);
+    font-size: 12px;
+}
+
+.must__src summary {
+    min-height: 28px;
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    color: var(--green);
-    font-size: 14px;
-    font-weight: 650;
+    gap: 2px;
+    list-style: none;
+    cursor: pointer;
 }
 
-.must__link::after {
-    content: "";
-    position: absolute;
-    inset: -11px -8px;
+.must__src summary::-webkit-details-marker {
+    display: none;
 }
 
-.must__link .icon {
-    width: 16px;
-    height: 16px;
+.must__src summary .icon {
+    width: 14px;
+    height: 14px;
 }
+
+.must__src[open] summary .icon {
+    transform: rotate(180deg);
+}
+
+.must__src p {
+    margin: 2px 0 0;
+    line-height: 1.6;
+    word-break: keep-all;
+}
+
+
+
 
 .call-summary {
     margin-top: 16px;
@@ -2063,15 +2101,6 @@ select.field__input {
     margin: 4px 20px 0;
 }
 
-button.must__link {
-    padding: 0;
-    border: 0;
-    background: none;
-    font: inherit;
-    font-size: 14px;
-    font-weight: 650;
-    cursor: pointer;
-}
 
 .from-must button {
     padding: 0;
