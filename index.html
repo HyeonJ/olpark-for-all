@@ -8,7 +8,7 @@
     <meta name="description" content="휠체어·유모차·어르신과 함께 올림픽공원에 가기 전, 공식 공공데이터로 준비할 것을 확인해요.">
     <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-    <link rel="stylesheet" href="style.css?v=202611261800s">
+    <link rel="stylesheet" href="style.css?v=202611271450b">
 </head>
 <body>
     <a class="skip-link" href="#main">본문 바로가기</a>
@@ -86,6 +86,10 @@
                     </label>
                 </div>
                 <p id="day-kind" class="condition__note"></p>
+                <div id="cond-done-wrap" class="condition__done" hidden>
+                    <p class="condition__live">바꾼 조건은 이 카드에 바로 반영돼요</p>
+                    <button id="cond-done" class="btn btn--primary condition__done-btn" type="button">완료</button>
+                </div>
             </div>
         </details>
 
@@ -94,9 +98,10 @@
                 <div id="applied" class="applied" role="status" hidden></div>
                 <section id="plan" class="plan" aria-labelledby="plan-title">
                     <div class="plan__head">
-                        <p class="plan__eyebrow"><span id="plan-who">이번 방문</span><button id="plan-edit" class="plan__edit" type="button">조건 바꾸기</button></p>
+                        <p class="plan__eyebrow"><span id="plan-who">이번 방문</span><button id="plan-edit" class="plan__edit" type="button" aria-expanded="false" aria-controls="plan-cond">조건 바꾸기</button></p>
                         <h1 id="plan-title" class="plan__title">불러오는 중…</h1>
                     </div>
+                    <div id="plan-cond" class="plan-cond" hidden></div>
                     <div id="plan-time" class="plan__row"></div>
                     <div id="plan-places" class="plan__row" hidden></div>
                     <div id="plan-call" class="plan__row" hidden></div>
@@ -188,6 +193,6 @@
         <a id="bottom-toggle" class="bottom-bar__toggle" href="#map"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg><span>시설 지도</span></a>
         <a id="bottom-call" class="bottom-bar__call" href="tel:024101114"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg><span id="bottom-call-label">공원 안내 전화하기</span></a>
     </nav>
-    <script src="app.js?v=202611261800s"></script>
+    <script src="app.js?v=202611271450b"></script>
 </body>
 </html>

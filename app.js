@@ -824,7 +824,37 @@
     /* 화면 전환 */
     const viewFromHash = () => (location.hash === "#map" ? "map" : "summary");
 
+    /* 요약 화면에선 조건 입력을 카드 안에서 펼친다 — 같은 입력 묶음을 옮겨 쓰므로 지도 화면과 이벤트가 그대로 공유된다 */
+    const openInlineEdit = () => {
+        $("plan-cond").appendChild(document.querySelector(".condition__body"));
+        $("plan-cond").hidden = false;
+        $("cond-done-wrap").hidden = false;
+        $("plan-edit").innerHTML = "접기<svg class=\"icon\" aria-hidden=\"true\"><use href=\"#i-down\"/></svg>";
+        $("plan-edit").setAttribute("aria-expanded", "true");
+        state.inlineEdit = true;
+        requestAnimationFrame(() => state.refreshScrollEdges?.());
+    };
+
+    const closeInlineEdit = (backToCard) => {
+        if (!state.inlineEdit) {
+            return;
+        }
+        document.querySelector(".condition").appendChild(document.querySelector(".condition__body"));
+        $("plan-cond").hidden = true;
+        $("cond-done-wrap").hidden = true;
+        $("plan-edit").textContent = "조건 바꾸기";
+        $("plan-edit").setAttribute("aria-expanded", "false");
+        state.inlineEdit = false;
+        if (backToCard) {
+            $("plan").scrollIntoView({ behavior: "smooth", block: "start" });
+            $("plan-edit").focus({ preventScroll: true });
+        }
+    };
+
     const showView = (name, scrollTop) => {
+        if (name !== "summary") {
+            closeInlineEdit(false);
+        }
         requestAnimationFrame(() => state.refreshScrollEdges?.());
         state.view = name;
         document.body.dataset.view = name;
@@ -967,11 +997,13 @@
             }
         });
         $("plan-edit").addEventListener("click", () => {
-            const cond = document.querySelector(".condition");
-            cond.open = true;
-            cond.scrollIntoView({ block: "start" });
-            cond.querySelector("summary").focus({ preventScroll: true });
+            if (state.inlineEdit) {
+                closeInlineEdit(false);
+            } else {
+                openInlineEdit();
+            }
         });
+        $("cond-done").addEventListener("click", () => closeInlineEdit(true));
         $("visit-date").addEventListener("click", () => {
             try {
                 $("visit-date").showPicker?.();
