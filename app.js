@@ -391,21 +391,19 @@
     const mustRow = (def) => {
         const item = access.items.find((it) => it.key === def.key);
         if (!item) {
-            return { id: def.id, name: def.label, badge: ["none", "공개 자료 없음"], fact: "관광공사 자료에서 찾지 못했어요.", source: "", ask: "", questions: [] };
+            return { id: def.id, name: def.label, badge: ["none", "공개 자료 없음"], fact: "관광공사 자료에서 찾지 못했어요.", api: "", web: "", ask: "", questions: [] };
         }
         const copy = MUST_COPY[def.id] || {};
         const fact = def.id === "restroom"
             ? `있다는 자료뿐 · 지도엔 등록된 ${toiletPinCount()}곳(현장 확인 전)`
             : copy.fact || item.api;
-        const source = item.status === "differs" || def.id === "restroom"
-            ? `관광공사 자료 «${item.api}» · 관광공사 누리집 «${item.web}»${def.id === "restroom" ? " · 위치는 오픈스트리트맵 등록(현장 확인 전)" : ""}`
-            : `관광공사 자료 «${item.api}»`;
         return {
             id: def.id,
             name: def.label,
             badge: copy.badge || (item.status === "differs" ? ["diff", "출처마다 다름"] : ["ok", "확인됨"]),
             fact,
-            source,
+            api: item.api,
+            web: item.web,
             ask: copy.ask || "",
             questions: copy.question ? [copy.question] : [],
             link: Boolean(def.link),
@@ -418,15 +416,31 @@
         const ask = row.ask
             ? `<a class="must__chip" href="tel:${PARK_PHONE.replace(/-/g, "")}" aria-label="공원 안내에 전화로 물어볼 것: ${esc(row.ask)}">${icon("phone")}물어볼 것: ${esc(row.ask)}</a>` : "";
         const acts = map || ask ? `<div class="must__acts">${map}${ask}</div>` : "";
-        const src = row.source
-            ? `<details class="must__src"><summary>자료 원문 보기${icon("down")}</summary><p>${esc(row.source)}</p></details>` : "";
         return `<li class="must"><span class="must__name">${esc(row.name)}</span>
             <span class="must__state must__state--${row.badge[0]}">${esc(row.badge[1])}</span>
-            <p class="must__fact">${esc(row.fact)}</p>${acts}${src}</li>`;
+            <p class="must__fact">${esc(row.fact)}</p>${acts}</li>`;
     };
 
     const callSummaryHtml = (questions) => `<strong>전화 한 번에 물어볼 것 ${questions.length}가지</strong> <span class="nowrap">· 공원 안내 ${PARK_PHONE}</span>
         <ol>${questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>`;
+
+    // 출처는 칸마다 반복하지 않고 섹션 끝 하나에 모은다(Darren M:agz3 · 시안 B M:nqj9) — 고른 항목의 두 자료 원문은 여기서 그대로 볼 수 있다
+    const renderMustSources = (rows) => {
+        const box = $("must-src");
+        const found = rows.filter((r) => r.api);
+        box.hidden = found.length === 0;
+        if (!found.length) {
+            return;
+        }
+        const web = access.sources.find((s) => s.id === "web");
+        const api = access.sources.find((s) => s.id === "api");
+        const items = found.map((r) => `<li><strong>${esc(r.name)}</strong>
+            <span>공공데이터: ${esc(r.api)}</span><span>누리집: ${esc(r.web)}</span></li>`).join("");
+        $("must-src-body").innerHTML = `<p>한국관광공사 무장애 여행 정보(공공데이터 API)와 관광공사 누리집을 대조했어요. 두 자료가 다른 항목은 칸의 딱지에 무엇이 다른지 적었어요. 장애인 화장실 위치는 오픈스트리트맵 등록 자료예요(현장 확인 전).</p>
+            <p class="must-srcbox__date">누리집 수정 ${esc(web.updatedAt)} · 대조 ${esc(api.checkedAt)}</p>
+            <ul class="must-srcbox__list">${items}</ul>
+            <a class="must-srcbox__link" href="${esc(web.url)}" target="_blank" rel="noopener">관광공사 누리집 원문 보기${icon("right")}</a>`;
+    };
 
     const renderMust = () => {
         document.querySelectorAll(".must-pick").forEach((btn) =>
@@ -440,6 +454,7 @@
             list.insertAdjacentHTML("beforeend", `<li class="must"><span class="must__name">시설 위치는 공원 안내에 물어보세요</span>
                 <span class="must__detail">공개 자료에는 점자 안내 장소 외의 시각장애인 편의 정보가 없어요.<br>공원 안내 ${PARK_PHONE}</span></li>`);
         }
+        renderMustSources(rows);
         const questions = rows.flatMap((r) => r.questions);
         const box = $("call-summary");
         box.hidden = questions.length === 0;

@@ -1,0 +1,398 @@
+Reading prompt from stdin...
+OpenAI Codex v0.166.0
+--------
+workdir: /home/bpx27/projects/olpark-for-all
+model: gpt-6.1-sol
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a21b5f-b766-7210-a810-b21a97551c21
+--------
+user
+You are reviewing UX for a Korean mobile web page (repo in cwd: index.html, app.js, style.css). Read-only; do NOT edit files. Answer in Korean, concise.
+
+Context
+- Page «모두의 올팍»: helps people visiting Olympic Park with wheelchair/stroller/elderly/visually impaired companions plan a visit. Contest-level polish needed.
+- Summary view top: a «이번 방문 준비» plan card (#plan) with a [조건 바꾸기] button (#plan-edit).
+- Conditions live in a <details class="condition"> ABOVE the card. In summary view it is hidden while closed (CSS `[data-view="summary"] .condition:not([open]) {display:none}`).
+- Clicking [조건 바꾸기] sets details.open=true, scrolls to it, focuses summary. Inputs (who chips, date, arrival hour, stay) apply live on change — there is no apply/confirm button.
+- To close, the user must tap the small chevron (summary row, which repeats «11.28 (토) · 오전 10시~오후 1시 · 휠체어» — the same info as the card title right below).
+- Attached screenshot shows the opened state (390px wide).
+
+Owner's feedback: "조건 바꾸기 눌러 위에 창이 열린 다음, 그 창은 화살표를 눌러야 닫힌다. 살짝 어색하다. 닫는 화살표를 더 잘 보이게 하면 괜찮을까? 레이아웃이든 UX든 바꾸는 방향으로 의견 줘."
+
+Please give:
+1. Why it feels awkward (diagnosis, 2-4 bullets).
+2. 2-3 concrete options (e.g., just make the chevron more visible / add explicit 완료·닫기 button / bottom sheet / inline edit inside the card / auto-close), each with pros/cons for this audience (older users, a11y, screen readers), and implementation weight in this codebase.
+3. Your single recommendation and why. Note anything about the duplicate summary line and live-apply.
+
+warning: Codex could not find bubblewrap on PATH. Install bubblewrap with your OS package manager. See the sandbox prerequisites: https://developers.openai.com/codex/concepts/sandboxing#prerequisites. Codex will use the bundled bubblewrap in the meantime.
+codex
+파일에서 열기·닫기 동작과 접근성 처리를 확인한 뒤, 이 화면에 맞는 개선안을 비교하겠습니다.
+exec
+/bin/bash -lc "rg -n 'plan-edit|class=\"condition|<summary|id=\"plan|condition|details|data-view' index.html app.js style.css" in /home/bpx27/projects/olpark-for-all
+ succeeded in 19ms:
+style.css:94:summary::-webkit-details-marker {
+style.css:224:.condition {
+style.css:230:.condition__summary {
+style.css:242:.condition__summary > .icon {
+style.css:248:.condition__summary .arrow {
+style.css:253:.condition[open] .arrow {
+style.css:257:.condition__text {
+style.css:264:.condition__text b {
+style.css:269:.condition__dot {
+style.css:274:.condition__body {
+style.css:282:.condition__group {
+style.css:289:.condition__legend {
+style.css:297:.condition__picks {
+style.css:308:.condition__picks::-webkit-scrollbar {
+style.css:373:.condition__row {
+style.css:379:.condition__row--pair {
+style.css:470:.condition__note {
+style.css:681:.details-head {
+style.css:1921:    .condition {
+style.css:1925:    .condition__summary {
+style.css:1931:    .condition__text b {
+style.css:1935:    .condition__dot {
+style.css:2000:[data-view="summary"] .condition:not([open]) {
+app.js:256:            <details class="data-detail"><summary class="data-detail__summary">범위와 기준 보기${icon("down")}</summary>
+app.js:262:            </div></details>`;
+app.js:522:        const dot = "<span class=\"condition__dot\">·</span>";
+app.js:524:            $("condition-text").textContent = "날짜를 선택해 주세요";
+app.js:535:        document.querySelector(".condition__summary").setAttribute("aria-label",
+app.js:537:        $("condition-text").innerHTML = `<b>${when.month}.${when.dayNum} (${when.weekday})${holiday}</b>${dot}${stayText}${dot}${tail}`;
+app.js:928:        document.querySelector(".condition").addEventListener("toggle", () => state.refreshScrollEdges());
+app.js:929:        document.querySelectorAll(".condition__picks .pick").forEach((btn) => btn.addEventListener("click", () => {
+app.js:969:        $("plan-edit").addEventListener("click", () => {
+app.js:970:            const cond = document.querySelector(".condition");
+index.html:53:        <details class="condition">
+index.html:54:            <summary class="condition__summary">
+index.html:56:                <span id="condition-text" class="condition__text"></span>
+index.html:59:            <div class="condition__body">
+index.html:60:                <fieldset class="condition__group">
+index.html:61:                    <legend class="condition__legend">함께 가는 분 (여러 명 선택 가능)</legend>
+index.html:62:                    <div class="condition__picks h-scroll">
+index.html:69:                <div class="condition__row">
+index.html:78:                <div class="condition__row condition__row--pair">
+index.html:88:                <p id="day-kind" class="condition__note"></p>
+index.html:90:        </details>
+index.html:95:                <section id="plan" class="plan" aria-labelledby="plan-title">
+index.html:97:                        <p class="plan__eyebrow"><span id="plan-who">이번 방문</span><button id="plan-edit" class="plan__edit" type="button">조건 바꾸기</button></p>
+index.html:98:                        <h1 id="plan-title" class="plan__title">불러오는 중…</h1>
+index.html:100:                    <div id="plan-time" class="plan__row"></div>
+index.html:101:                    <div id="plan-places" class="plan__row" hidden></div>
+index.html:102:                    <div id="plan-call" class="plan__row" hidden></div>
+index.html:106:                    <span><span id="plan-basis">작년 기록과 비교했어요.</span> 그날 공연·행사는 반영되지 않았어요 · <a href="https://www.ksponco.or.kr/olympicpark/menu.es?mid=a20301000000" target="_blank" rel="noopener">공연 일정 보기</a></span>
+index.html:109:                <p class="details-head">자세히 보기</p>
+index.html:144:                <details class="sources">
+index.html:145:                    <summary>데이터 출처와 기준<svg class="icon" aria-hidden="true"><use href="#i-down"/></svg></summary>
+index.html:147:                </details>
+index.html:169:                <details class="map-sources">
+index.html:170:                    <summary>지도·시설 정보 출처<svg class="icon" aria-hidden="true"><use href="#i-down"/></svg></summary>
+index.html:172:                </details>
+
+exec
+/bin/bash -lc "sed -n '50,103p' index.html
+sed -n '510,540p' app.js
+sed -n '915,985p' app.js
+sed -n '224,282p' style.css
+sed -n '1990,2008p' style.css" in /home/bpx27/projects/olpark-for-all
+ succeeded in 0ms:
+            <a id="tab-map" class="tabs__link" href="#map">편의시설 지도</a>
+        </nav>
+
+        <details class="condition">
+            <summary class="condition__summary">
+                <svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>
+                <span id="condition-text" class="condition__text"></span>
+                <svg class="icon arrow" aria-hidden="true"><use href="#i-down"/></svg>
+            </summary>
+            <div class="condition__body">
+                <fieldset class="condition__group">
+                    <legend class="condition__legend">함께 가는 분 (여러 명 선택 가능)</legend>
+                    <div class="condition__picks h-scroll">
+                        <button class="pick" type="button" data-who="wheelchair" aria-pressed="true"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>휠체어</span></button>
+                        <button class="pick" type="button" data-who="stroller" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>유모차·아이 동반</span></button>
+                        <button class="pick" type="button" data-who="senior" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>어르신</span></button>
+                        <button class="pick" type="button" data-who="visual" aria-pressed="false"><span class="pick__face"><svg class="pick__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>시각장애인</span></button>
+                    </div>
+                </fieldset>
+                <div class="condition__row">
+                    <label class="field">
+                        <span>날짜</span>
+                        <span class="date-field">
+                            <span id="visit-date-shown" class="field__input date-field__shown" aria-hidden="true"></span>
+                            <input id="visit-date" class="date-field__native" type="date">
+                        </span>
+                    </label>
+                </div>
+                <div class="condition__row condition__row--pair">
+                    <label class="field">
+                        <span>도착 시각</span>
+                        <select id="visit-hour" class="field__input"></select>
+                    </label>
+                    <label class="field">
+                        <span>머무는 시간</span>
+                        <select id="visit-stay" class="field__input"></select>
+                    </label>
+                </div>
+                <p id="day-kind" class="condition__note"></p>
+            </div>
+        </details>
+
+        <main id="main">
+            <div id="view-summary" class="view">
+                <div id="applied" class="applied" role="status" hidden></div>
+                <section id="plan" class="plan" aria-labelledby="plan-title">
+                    <div class="plan__head">
+                        <p class="plan__eyebrow"><span id="plan-who">이번 방문</span><button id="plan-edit" class="plan__edit" type="button">조건 바꾸기</button></p>
+                        <h1 id="plan-title" class="plan__title">불러오는 중…</h1>
+                    </div>
+                    <div id="plan-time" class="plan__row"></div>
+                    <div id="plan-places" class="plan__row" hidden></div>
+                    <div id="plan-call" class="plan__row" hidden></div>
+                </section>
+        if (when.holidayName) {
+            return `${esc(when.holidayName)} · 공휴일이라 주말·휴일 기록과 비교해요.`;
+        }
+        if (when.isWeekend) {
+            return "주말이라 주말·휴일 기록과 비교해요.";
+        }
+        return when.holidayKnown
+            ? "공휴일이 아닌 평일이라 평일 기록과 비교해요."
+            : "공휴일 정보가 없는 해라 주말만 구분했어요. 평일 기록과 비교해요.";
+    };
+
+    const renderCondition = (when) => {
+        const dot = "<span class=\"condition__dot\">·</span>";
+        if (!when) {
+            $("condition-text").textContent = "날짜를 선택해 주세요";
+            $("day-kind").textContent = "";
+            return;
+        }
+        const labels = whoLabels();
+        // 여러 유형이면 «○○ 외» — 숫자를 붙이면 «1명/1가지» 중 무엇을 세는지가 생긴다(Darren M:n8ax → M:0ty2 «외»로 시험)
+        const who = labels.length > 1 ? `${labels[0]} 외` : labels[0] || "동행 선택 안 함";
+        const holiday = when.holidayName ? ` ${esc(when.holidayName)}` : "";
+        const tail = esc(who);
+        const stayText = rangeWord(when.hour, when.hour + when.stayUsed);
+        // aria-label 은 일반 span 에선 낭독되지 않는다 — 누를 수 있는 summary 에 단다
+        document.querySelector(".condition__summary").setAttribute("aria-label",
+            `${when.month}월 ${when.dayNum}일 ${when.weekday}요일${when.holidayName || ""}, ${hourWord(when.hour)} 도착, 머무는 시간 ${when.stayUsed}시간, ${labels.length ? `함께 가는 분 ${labels.join(", ")}` : "동행 선택 안 함"}`);
+        $("condition-text").innerHTML = `<b>${when.month}.${when.dayNum} (${when.weekday})${holiday}</b>${dot}${stayText}${dot}${tail}`;
+        $("day-kind").innerHTML = dayKindText(when);
+    };
+
+        el.addEventListener("pointerleave", () => {
+            if (drag && !drag.moved) {
+                drag = null;
+            }
+        });
+        return updateEdges;
+    };
+
+    const bind = () => {
+        const edgeUpdaters = [...document.querySelectorAll(".h-scroll")].map(enableHScroll);
+        state.refreshScrollEdges = () => edgeUpdaters.forEach((fn) => fn());
+        requestAnimationFrame(state.refreshScrollEdges);
+        // 접힌 상자 안에선 폭이 0 이라 가장자리를 못 잰다 — 펼칠 때 다시 잰다
+        document.querySelector(".condition").addEventListener("toggle", () => state.refreshScrollEdges());
+        document.querySelectorAll(".condition__picks .pick").forEach((btn) => btn.addEventListener("click", () => {
+            toggleSet(state.who, btn.dataset.who);
+            btn.setAttribute("aria-pressed", String(state.who.has(btn.dataset.who)));
+            resetMustToWho();
+            syncFiltersToWho();
+            state.applied = null;
+            renderSummary();
+            renderMap();
+        }));
+        $("must-picks").addEventListener("click", (e) => {
+            const btn = e.target.closest(".must-pick");
+            if (btn) {
+                toggleSet(state.must, btn.dataset.must);
+                renderSummary();
+            }
+        });
+        ["visit-date", "visit-hour", "visit-stay"].forEach((id) => $(id).addEventListener("change", () => {
+            state.applied = null;
+            renderSummary();
+        }));
+        $("view-summary").addEventListener("click", (e) => {
+            const apply = e.target.closest("[data-apply-hour]");
+            if (apply) {
+                applyHour(Number(apply.dataset.applyHour));
+                return;
+            }
+            if (e.target.closest("#applied-undo")) {
+                undoApplied();
+                return;
+            }
+            const go = e.target.closest("[data-go-kind]");
+            if (go) {
+                goToMap(go.dataset.goKind.split(" "), go.dataset.goPlace, go.dataset.goFrom);
+                return;
+            }
+            const jump = e.target.closest("[data-scroll]");
+            if (jump) {
+                $(jump.dataset.scroll).scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
+        $("plan-edit").addEventListener("click", () => {
+            const cond = document.querySelector(".condition");
+            cond.open = true;
+            cond.scrollIntoView({ block: "start" });
+            cond.querySelector("summary").focus({ preventScroll: true });
+        });
+        $("visit-date").addEventListener("click", () => {
+            try {
+                $("visit-date").showPicker?.();
+            } catch (err) {
+                console.error("[showPicker] 실패", err);
+            }
+        });
+        $("map-filters").addEventListener("click", (e) => {
+            const btn = e.target.closest(".filter");
+            if (btn) {
+                toggleSet(state.filters, btn.dataset.kind);
+.condition {
+    margin: 16px 20px 0;
+    border-radius: 14px;
+    background: var(--canvas);
+}
+
+.condition__summary {
+    min-height: 56px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 550;
+    letter-spacing: -0.035em;
+    cursor: pointer;
+}
+
+.condition__summary > .icon {
+    width: 20px;
+    height: 20px;
+    color: var(--secondary);
+}
+
+.condition__summary .arrow {
+    width: 18px;
+    margin-left: auto;
+}
+
+.condition[open] .arrow {
+    transform: rotate(180deg);
+}
+
+.condition__text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.condition__text b {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.condition__dot {
+    margin: 0 6px;
+    color: var(--secondary);
+}
+
+.condition__body {
+    padding: 0 14px 14px;
+    display: grid;
+    gap: 14px;
+    color: var(--secondary);
+    font-size: 13px;
+}
+
+.condition__group {
+.h-scroll.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+/* 요약 화면에선 조건 막대를 카드의 «조건 바꾸기»로 대신한다 — 펼쳤을 때만 보인다 */
+[data-view="summary"] .condition:not([open]) {
+    display: none;
+}
+
+.hero__event {
+    margin: 4px 20px 0;
+}
+
+button.must__link {
+
+codex
+**화살표를 키우면 발견하기는 쉬워지지만, 핵심은 ‘편집을 끝내고 결과로 돌아가는 동작’이 없다는 점입니다.** 현재 구조를 유지하면서 하단에 명확한 종료 버튼을 두는 안을 추천합니다. 파일은 수정하지 않았습니다.
+
+**1. 어색한 이유**
+
+- **들어갈 때와 나올 때의 언어가 다릅니다.** ‘조건 바꾸기’로 시작했는데, 끝내려면 위쪽 화살표가 닫기 기능임을 알아내야 합니다.
+- **입력을 마치는 위치에 종료 수단이 없습니다.** 머무는 시간까지 고른 뒤 다시 맨 위로 올라가야 합니다. 실제로는 요약 행 전체가 클릭 영역이지만, 화면에서는 작은 화살표만 조작 대상으로 보입니다.
+- **같은 정보를 연달아 보여줍니다.** 편집 영역 상단의 날짜·시간·동행 요약과 바로 아래 카드 제목이 중복되어, 두 영역의 역할이 흐려집니다.
+- **즉시 반영 여부가 드러나지 않습니다.** 값은 이미 바뀌었지만, 사용자는 ‘저장됐나, 닫아야 적용되나’를 판단하기 어렵습니다.
+
+**2. 선택지 비교**
+
+| 안 | 장점 | 단점·접근성 고려 | 구현 부담 |
+|---|---|---|---|
+| **① 상단에 ‘접기 ∧’ 표시** | 현재 구조를 그대로 활용. 고령 사용자도 화살표 의미를 추측할 필요가 줄어듦. 네이티브 `details`의 키보드·펼침 상태 전달 유지 | 입력 후 위로 돌아가야 하는 문제와 중복 요약은 남음. 현재 `summary`의 `aria-label`도 접기 목적을 전달하도록 수정 필요 | **작음** — HTML·CSS와 낭독 이름 수정 |
+| **② 하단에 ‘완료 · 결과 보기’ 버튼 추가** | 입력 순서 끝에 다음 행동이 생김. 닫은 뒤 결과로 이동하므로 흐름이 명확. 일반 버튼이라 키보드·스크린리더 대응도 단순 | ‘완료를 눌러야 저장된다’고 오해할 수 있어 즉시 반영 안내 필요. 닫힐 때 포커스 복귀 처리 필요 | **작음~중간** — 버튼, 닫기·스크롤·포커스 처리 추가 |
+| **③ 카드 안에서 조건 편집** | ‘조건 바꾸기’를 누른 자리에서 편집하므로 위로 이동하는 낯선 흐름이 사라짐. 카드 제목과 편집 영역의 관계도 분명 | 카드가 길어지고 결과가 아래로 밀림. 현재 조건 영역을 지도 화면에서도 사용하는 구조까지 확인해 재배치해야 함 | **중간** — DOM 구조·스타일·이벤트 조정 |
+
+바텀시트는 편집 영역을 분명히 구분하지만, 이 코드에서는 모달 포커스 관리·배경 접근 차단·스크롤 복귀까지 필요해 부담이 큽니다. 자동 닫기는 여러 조건을 연속으로 바꾸는 도중 흐름을 끊으므로 권하지 않습니다.
+
+**3. 추천: ② 명시적인 종료 버튼**
+
+현재 구조에서 완성도를 가장 효율적으로 높일 수 있습니다.
+
+- 열린 영역 상단은 반복 요약 대신 **‘방문 조건 수정’**으로 표시하고, 오른쪽에 **‘접기 ∧’**를 둡니다.
+- 입력 아래에 **‘변경한 조건은 바로 반영돼요.’**와 충분히 큰 **‘완료 · 결과 보기’** 버튼을 둡니다.
+- 버튼을 누르면 조건 영역을 닫고 방문 카드로 스크롤합니다. 포커스는 다시 보이는 **‘조건 바꾸기’ 버튼**으로 돌려, 숨겨진 영역 안에 남지 않게 합니다.
+- 즉시 반영은 유지합니다. 이 버튼은 저장이 아니라 **편집 종료와 결과 복귀** 역할입니다. 따라서 ‘적용’이라는 이름은 피하는 편이 좋습니다.
+
+날짜·시간·동행의 최종 요약은 아래 방문 카드가 맡으면 됩니다. 편집 영역은 **무엇을 수정하는 곳인지**, 카드는 **그 조건으로 어떤 방문을 준비하는지** 보여주도록 역할을 나누는 것이 핵심입니다.
+tokens used
+25,864
+**화살표를 키우면 발견하기는 쉬워지지만, 핵심은 ‘편집을 끝내고 결과로 돌아가는 동작’이 없다는 점입니다.** 현재 구조를 유지하면서 하단에 명확한 종료 버튼을 두는 안을 추천합니다. 파일은 수정하지 않았습니다.
+
+**1. 어색한 이유**
+
+- **들어갈 때와 나올 때의 언어가 다릅니다.** ‘조건 바꾸기’로 시작했는데, 끝내려면 위쪽 화살표가 닫기 기능임을 알아내야 합니다.
+- **입력을 마치는 위치에 종료 수단이 없습니다.** 머무는 시간까지 고른 뒤 다시 맨 위로 올라가야 합니다. 실제로는 요약 행 전체가 클릭 영역이지만, 화면에서는 작은 화살표만 조작 대상으로 보입니다.
+- **같은 정보를 연달아 보여줍니다.** 편집 영역 상단의 날짜·시간·동행 요약과 바로 아래 카드 제목이 중복되어, 두 영역의 역할이 흐려집니다.
+- **즉시 반영 여부가 드러나지 않습니다.** 값은 이미 바뀌었지만, 사용자는 ‘저장됐나, 닫아야 적용되나’를 판단하기 어렵습니다.
+
+**2. 선택지 비교**
+
+| 안 | 장점 | 단점·접근성 고려 | 구현 부담 |
+|---|---|---|---|
+| **① 상단에 ‘접기 ∧’ 표시** | 현재 구조를 그대로 활용. 고령 사용자도 화살표 의미를 추측할 필요가 줄어듦. 네이티브 `details`의 키보드·펼침 상태 전달 유지 | 입력 후 위로 돌아가야 하는 문제와 중복 요약은 남음. 현재 `summary`의 `aria-label`도 접기 목적을 전달하도록 수정 필요 | **작음** — HTML·CSS와 낭독 이름 수정 |
+| **② 하단에 ‘완료 · 결과 보기’ 버튼 추가** | 입력 순서 끝에 다음 행동이 생김. 닫은 뒤 결과로 이동하므로 흐름이 명확. 일반 버튼이라 키보드·스크린리더 대응도 단순 | ‘완료를 눌러야 저장된다’고 오해할 수 있어 즉시 반영 안내 필요. 닫힐 때 포커스 복귀 처리 필요 | **작음~중간** — 버튼, 닫기·스크롤·포커스 처리 추가 |
+| **③ 카드 안에서 조건 편집** | ‘조건 바꾸기’를 누른 자리에서 편집하므로 위로 이동하는 낯선 흐름이 사라짐. 카드 제목과 편집 영역의 관계도 분명 | 카드가 길어지고 결과가 아래로 밀림. 현재 조건 영역을 지도 화면에서도 사용하는 구조까지 확인해 재배치해야 함 | **중간** — DOM 구조·스타일·이벤트 조정 |
+
+바텀시트는 편집 영역을 분명히 구분하지만, 이 코드에서는 모달 포커스 관리·배경 접근 차단·스크롤 복귀까지 필요해 부담이 큽니다. 자동 닫기는 여러 조건을 연속으로 바꾸는 도중 흐름을 끊으므로 권하지 않습니다.
+
+**3. 추천: ② 명시적인 종료 버튼**
+
+현재 구조에서 완성도를 가장 효율적으로 높일 수 있습니다.
+
+- 열린 영역 상단은 반복 요약 대신 **‘방문 조건 수정’**으로 표시하고, 오른쪽에 **‘접기 ∧’**를 둡니다.
+- 입력 아래에 **‘변경한 조건은 바로 반영돼요.’**와 충분히 큰 **‘완료 · 결과 보기’** 버튼을 둡니다.
+- 버튼을 누르면 조건 영역을 닫고 방문 카드로 스크롤합니다. 포커스는 다시 보이는 **‘조건 바꾸기’ 버튼**으로 돌려, 숨겨진 영역 안에 남지 않게 합니다.
+- 즉시 반영은 유지합니다. 이 버튼은 저장이 아니라 **편집 종료와 결과 복귀** 역할입니다. 따라서 ‘적용’이라는 이름은 피하는 편이 좋습니다.
+
+날짜·시간·동행의 최종 요약은 아래 방문 카드가 맡으면 됩니다. 편집 영역은 **무엇을 수정하는 곳인지**, 카드는 **그 조건으로 어떤 방문을 준비하는지** 보여주도록 역할을 나누는 것이 핵심입니다.
